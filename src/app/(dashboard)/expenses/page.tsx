@@ -1,17 +1,49 @@
 'use client';
 
-import { useState } from 'react';
-import { RefreshCw, Plus, Wallet, FileText, Banknote, Edit2, Trash2, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { RefreshCw, Plus, Wallet, FileText, Banknote, Edit2, Trash2, CheckCircle2, Loader2 } from 'lucide-react';
 import styles from './expenses.module.css';
 
-const MOCK_EXPENSES = [
-    { id: 1, amount: 5000, desc: 'Канцы', cat: 'Канцелярия', source: 'Cash', status: 'completed', isIncome: false },
-    { id: 2, amount: 25000, desc: 'Поставка кола', cat: 'Закуп продуктов', source: 'Halyk', status: 'pending', isIncome: false },
-    { id: 3, amount: 4000, desc: 'Размен из сейфа', cat: 'Поступления', source: 'Cash', status: 'completed', isIncome: true },
-];
+interface Expense {
+    id: number;
+    amount: string;
+    description: string;
+    category: string;
+    source: string;
+    status: string;
+    isIncome: boolean;
+}
 
 export default function ExpensesPage() {
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState(() => {
+        const d = new Date();
+        if (d.getHours() < 6) d.setDate(d.getDate() - 1);
+        return d.toISOString().split('T')[0];
+    });
+
+    const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [summary, setSummary] = useState({ cash: 0, kaspi: 0, halyk: 0 });
+    const [isLoading, setIsLoading] = useState(false);
+
+    const fetchExpenses = async () => {
+        setIsLoading(true);
+        try {
+            const res = await fetch(`/api/expenses?date=${date}`);
+            const data = await res.json();
+            if (data.success) {
+                setExpenses(data.expenses);
+                setSummary(data.summary);
+            }
+        } catch (e) {
+            console.error('Failed to fetch expenses', e);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchExpenses();
+    }, [date]);
 
     return (
         <div className={styles.container}>
@@ -26,8 +58,8 @@ export default function ExpensesPage() {
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
                     />
-                    <button className={styles.syncBtn}>
-                        <RefreshCw size={18} />
+                    <button className={styles.syncBtn} onClick={fetchExpenses} disabled={isLoading}>
+                        <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} />
                         Синхронизировать
                     </button>
                     <button className={styles.primaryBtn}>
@@ -46,15 +78,7 @@ export default function ExpensesPage() {
                     </div>
                     <div className={styles.balanceRow}>
                         <span className={styles.balanceLabel}>Фактический</span>
-                        <span className={styles.balanceValue}>145 000 ₸</span>
-                    </div>
-                    <div className={styles.balanceRow}>
-                        <span className={styles.balanceLabel}>В Poster</span>
-                        <span className={styles.balanceValue}>141 000 ₸</span>
-                    </div>
-                    <div className={styles.balanceRow} style={{ marginTop: '0.5rem', borderTop: '1px dashed var(--border)', paddingTop: '1rem' }}>
-                        <span className={styles.balanceLabel}>Разница</span>
-                        <span className={`${styles.balanceValue} ${styles.positive}`}>+ 4 000 ₸</span>
+                        <span className={styles.balanceValue}>{summary.cash.toLocaleString('ru')} ₸</span>
                     </div>
                 </div>
 
@@ -65,15 +89,7 @@ export default function ExpensesPage() {
                     </div>
                     <div className={styles.balanceRow}>
                         <span className={styles.balanceLabel}>Фактический</span>
-                        <span className={styles.balanceValue}>412 500 ₸</span>
-                    </div>
-                    <div className={styles.balanceRow}>
-                        <span className={styles.balanceLabel}>В Poster</span>
-                        <span className={styles.balanceValue}>412 500 ₸</span>
-                    </div>
-                    <div className={styles.balanceRow} style={{ marginTop: '0.5rem', borderTop: '1px dashed var(--border)', paddingTop: '1rem' }}>
-                        <span className={styles.balanceLabel}>Разница</span>
-                        <span className={styles.balanceValue}>0 ₸</span>
+                        <span className={styles.balanceValue}>{summary.kaspi.toLocaleString('ru')} ₸</span>
                     </div>
                 </div>
 
@@ -84,15 +100,7 @@ export default function ExpensesPage() {
                     </div>
                     <div className={styles.balanceRow}>
                         <span className={styles.balanceLabel}>Фактический</span>
-                        <span className={styles.balanceValue}>85 000 ₸</span>
-                    </div>
-                    <div className={styles.balanceRow}>
-                        <span className={styles.balanceLabel}>В Poster</span>
-                        <span className={styles.balanceValue}>100 000 ₸</span>
-                    </div>
-                    <div className={styles.balanceRow} style={{ marginTop: '0.5rem', borderTop: '1px dashed var(--border)', paddingTop: '1rem' }}>
-                        <span className={styles.balanceLabel}>Разница</span>
-                        <span className={`${styles.balanceValue} ${styles.negative}`}>- 15 000 ₸</span>
+                        <span className={styles.balanceValue}>{summary.halyk.toLocaleString('ru')} ₸</span>
                     </div>
                 </div>
             </div>
@@ -111,39 +119,53 @@ export default function ExpensesPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {MOCK_EXPENSES.map(exp => (
-                            <tr key={exp.id}>
-                                <td data-label="Сумма">
-                                    <span className={`${styles.amount} ${exp.isIncome ? styles.income : ''}`}>
-                                        {exp.isIncome ? '+' : '-'} {exp.amount.toLocaleString('ru')} ₸
-                                    </span>
-                                </td>
-                                <td data-label="Описание" style={{ fontWeight: 500 }}>{exp.desc}</td>
-                                <td data-label="Категория" style={{ color: 'var(--primary)' }}>{exp.cat}</td>
-                                <td data-label="Источник">
-                                    <span className={`${styles.badge} ${styles.source}`}>{exp.source}</span>
-                                </td>
-                                <td data-label="Статус">
-                                    <span className={`${styles.badge} ${exp.status === 'completed' ? styles.statusCompleted : styles.statusPending}`}>
-                                        {exp.status === 'completed' ? (
-                                            <><CheckCircle2 size={14} style={{ marginRight: '4px' }} /> Проведён</>
-                                        ) : (
-                                            'Черновик'
-                                        )}
-                                    </span>
-                                </td>
-                                <td data-label="Действия">
-                                    <div className={styles.rowActions}>
-                                        <button className={styles.actionBtn}>
-                                            <Edit2 size={16} />
-                                        </button>
-                                        <button className={`${styles.actionBtn} ${styles.delete}`}>
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
+                        {isLoading ? (
+                            <tr>
+                                <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
+                                    <Loader2 className="animate-spin" style={{ margin: '0 auto', color: 'var(--primary)' }} />
                                 </td>
                             </tr>
-                        ))}
+                        ) : expenses.length === 0 ? (
+                            <tr>
+                                <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: 'var(--muted)' }}>
+                                    Нет транзакций за выбранный день
+                                </td>
+                            </tr>
+                        ) : (
+                            expenses.map(exp => (
+                                <tr key={exp.id}>
+                                    <td data-label="Сумма">
+                                        <span className={`${styles.amount} ${exp.isIncome ? styles.income : ''}`}>
+                                            {exp.isIncome ? '+' : '-'} {Number(exp.amount).toLocaleString('ru')} ₸
+                                        </span>
+                                    </td>
+                                    <td data-label="Описание" style={{ fontWeight: 500 }}>{exp.description}</td>
+                                    <td data-label="Категория" style={{ color: 'var(--primary)' }}>{exp.category || 'Без категории'}</td>
+                                    <td data-label="Источник">
+                                        <span className={`${styles.badge} ${styles.source}`}>{exp.source}</span>
+                                    </td>
+                                    <td data-label="Статус">
+                                        <span className={`${styles.badge} ${exp.status === 'completed' ? styles.statusCompleted : styles.statusPending}`}>
+                                            {exp.status === 'completed' ? (
+                                                <><CheckCircle2 size={14} style={{ marginRight: '4px' }} /> Проведён</>
+                                            ) : (
+                                                'Черновик'
+                                            )}
+                                        </span>
+                                    </td>
+                                    <td data-label="Действия">
+                                        <div className={styles.rowActions}>
+                                            <button className={styles.actionBtn}>
+                                                <Edit2 size={16} />
+                                            </button>
+                                            <button className={`${styles.actionBtn} ${styles.delete}`}>
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>

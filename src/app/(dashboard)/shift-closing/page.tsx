@@ -69,13 +69,15 @@ export default function ShiftClosingPage() {
                     });
 
                     // Auto-fill from cashier/cafe if available
-                    if (data.cashier_wolt) setWolt(String(data.cashier_wolt));
-                    if (data.cashier_halyk) setHalyk(String(data.cashier_halyk));
-                    if (data.cashier_cash_bills) setCashBills(String(data.cashier_cash_bills));
-                    if (data.cashier_cash_coins) setCashCoins(String(data.cashier_cash_coins));
-                    if (data.cashier_expenses) setExpenses(String(data.cashier_expenses));
-                    if (data.cafe_kaspi_pizzburg) setKaspiCafe(String(data.cafe_kaspi_pizzburg));
-                    if (data.poster_prev_shift_left) setShiftStart(String(data.poster_prev_shift_left / 100));
+                    if (data.cashier_wolt !== undefined) setWolt(String(data.cashier_wolt));
+                    if (data.cashier_halyk !== undefined) setHalyk(String(data.cashier_halyk));
+                    if (data.cashier_kaspi !== undefined) setKaspi(String(data.cashier_kaspi));
+                    if (data.cashier_cash_bills !== undefined) setCashBills(String(data.cashier_cash_bills));
+                    if (data.cashier_cash_coins !== undefined) setCashCoins(String(data.cashier_cash_coins));
+                    if (data.cashier_expenses !== undefined) setExpenses(String(data.cashier_expenses));
+                    if (data.cafe_kaspi_pizzburg !== undefined) setKaspiCafe(String(data.cafe_kaspi_pizzburg));
+                    if (data.poster_prev_shift_left !== undefined) setShiftStart(String(data.poster_prev_shift_left));
+                    if (data.cash_to_leave !== undefined) setCashToLeave(String(data.cash_to_leave));
                 }
             } catch (error) {
                 console.error("Error fetching poster data:", error);
