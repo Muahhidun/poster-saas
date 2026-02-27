@@ -19,19 +19,19 @@ export async function GET() {
 
         for (const row of usersRes.rows) {
             let org = await prisma.organization.findUnique({
-                where: { legacyTelegramId: BigInt(row.telegram_user_id) }
+                where: { legacy_telegram_id: BigInt(row.telegram_user_id) }
             });
 
             if (!org) {
                 org = await prisma.organization.create({
                     data: {
                         name: `Legacy Org ${row.telegram_user_id}`,
-                        legacyTelegramId: BigInt(row.telegram_user_id),
-                        posterToken: row.poster_token,
-                        posterUserId: row.poster_user_id,
-                        posterBaseUrl: row.poster_base_url,
-                        subscriptionStatus: row.subscription_status || 'trial',
-                        subscriptionExpires: row.subscription_expires_at,
+                        legacy_telegram_id: BigInt(row.telegram_user_id),
+                        poster_token: row.poster_token,
+                        poster_user_id: row.poster_user_id,
+                        poster_base_url: row.poster_base_url,
+                        subscription_status: row.subscription_status || 'trial',
+                        subscription_expires: row.subscription_expires_at,
                         createdAt: row.created_at || new Date(),
                         updatedAt: row.updated_at || new Date()
                     }
