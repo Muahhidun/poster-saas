@@ -1,0 +1,314 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--foreground);
+    letter-spacing: -0.02em;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.primaryBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.primaryBtn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.configCard {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    .configCard {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    }
+}
+
+.infoBanner {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--primary);
+    padding: 1rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.transactionList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.transactionItem {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto auto auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--background);
+    transition: all 0.2s;
+}
+
+.transactionItem:hover {
+    border-color: rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+@media (prefers-color-scheme: dark) {
+    .transactionItem:hover {
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+}
+
+.itemDisabled {
+    opacity: 0.6;
+    background: transparent;
+}
+
+.dragHandle {
+    color: #94a3b8;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.transactionDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.categoryName {
+    font-weight: 600;
+    color: var(--foreground);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.accountInfo {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+@media (prefers-color-scheme: dark) {
+    .accountInfo {
+        color: #94a3b8;
+    }
+}
+
+.inputField {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--foreground);
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s;
+    width: 100px;
+}
+
+.commentField {
+    width: 180px;
+}
+
+.inputField:focus {
+    border-color: var(--primary);
+}
+
+/* Toggle Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: .3s;
+    border-radius: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .slider {
+        background-color: #475569;
+    }
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked+.slider {
+    background-color: var(--success);
+}
+
+input:checked+.slider:before {
+    transform: translateX(20px);
+}
+
+.actionBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.actionBtn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--primary);
+}
+
+.actionBtn.delete {
+    color: var(--danger);
+}
+
+.actionBtn.delete:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .actionBtn:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .controls {
+        width: 100%;
+    }
+
+    .controls button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .configCard {
+        padding: 1rem;
+    }
+
+    .transactionItem {
+        grid-template-columns: auto 1fr auto;
+        grid-template-areas:
+            "drag details toggle"
+            "drag amount amount"
+            "drag comment comment"
+            "drag actions actions";
+        gap: 0.75rem;
+    }
+
+    .dragHandle {
+        grid-area: drag;
+    }
+
+    .transactionDetails {
+        grid-area: details;
+    }
+
+    .switchWrap {
+        grid-area: toggle;
+        justify-self: end;
+    }
+
+    .amountWrap {
+        grid-area: amount;
+        width: 100%;
+    }
+
+    .commentWrap {
+        grid-area: comment;
+        width: 100%;
+    }
+
+    .actionsWrap {
+        grid-area: actions;
+        justify-self: end;
+    }
+
+    .inputField {
+        width: 100%;
+    }
+
+    .commentField {
+        width: 100%;
+    }
+}

@@ -1,0 +1,40 @@
+.layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--background);
+}
+
+.mainContent {
+    flex: 1;
+    margin-left: 260px;
+    /* matches sidebar width */
+    display: flex;
+    flex-direction: column;
+}
+
+.pageContainer {
+    padding: 2.5rem 3rem;
+    max-width: 1200px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .layout {
+        flex-direction: column;
+    }
+
+    .mainContent {
+        margin-left: 0;
+        padding-bottom: 70px;
+        /* space for bottom nav */
+        width: 100vw;
+        overflow-x: hidden;
+    }
+
+    .pageContainer {
+        padding: 1.5rem 1rem;
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+}

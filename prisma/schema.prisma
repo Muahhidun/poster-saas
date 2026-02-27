@@ -1,0 +1,417 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  CASHIER
+}
+
+enum ExpenseSource {
+  CASH
+  KASPI
+  HALYK
+}
+
+enum ExpenseType {
+  TRANSACTION
+  SUPPLY
+}
+
+enum CompletionStatus {
+  PENDING
+  PARTIAL
+  COMPLETED
+}
+
+enum ItemType {
+  INGREDIENT
+  SEMI_PRODUCT
+  PRODUCT
+}
+
+model Organization {
+  id                    String    @id @default(uuid())
+  name                  String
+  legacy_telegram_id    BigInt?   @unique
+  poster_token          String?
+  poster_user_id        String?
+  poster_base_url       String?
+  subscription_status   String    @default("trial")
+  subscription_expires  DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  users                 User[]
+  posterAccounts        PosterAccount[]
+  expenseDrafts         ExpenseDraft[]
+  supplyDrafts          SupplyDraft[]
+  shiftClosings         ShiftClosing[]
+  cashierShiftData      CashierShiftData[]
+  shiftReconciliations  ShiftReconciliation[]
+  ingredientAliases     IngredientAlias[]
+  supplierAliases       SupplierAlias[]
+  ingredientPriceHist   IngredientPriceHistory[]
+  shipmentTemplates     ShipmentTemplate[]
+  employees             Employee[]
+  dailyTxLogs           DailyTransactionLog[]
+  dailyTxConfigs        DailyTransactionConfig[]
+  userSettings          UserSettings?
+
+  ingredientCaches      IngredientCache[]
+  productCaches         ProductCache[]
+  supplierCaches        SupplierCache[]
+  financeAccountCaches  FinanceAccountCache[]
+}
+
+model IngredientCache {
+  id                 Int      @id @default(autoincrement())
+  organizationId     String
+  posterIngredientId Int
+  name               String
+  unit               String?
+  type               Int      
+  posterAccountId    Int
+  posterAccountName  String?
+  storageId          Int?
+  storageName        String?
+  updatedAt          DateTime @updatedAt
+
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@unique([organizationId, posterAccountId, posterIngredientId])
+}
+
+model ProductCache {
+  id                 Int      @id @default(autoincrement())
+  organizationId     String
+  posterProductId    Int
+  name               String
+  categoryName       String?
+  posterAccountId    Int
+  updatedAt          DateTime @updatedAt
+
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@unique([organizationId, posterAccountId, posterProductId])
+}
+
+model SupplierCache {
+  id                 Int      @id @default(autoincrement())
+  organizationId     String
+  posterSupplierId   Int
+  name               String
+  updatedAt          DateTime @updatedAt
+
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@unique([organizationId, posterSupplierId])
+}
+
+model FinanceAccountCache {
+  id                 Int      @id @default(autoincrement())
+  organizationId     String
+  posterAccountId    Int      
+  name               String
+  type               String?
+  appPosterAccountId Int      
+  updatedAt          DateTime @updatedAt
+
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@unique([organizationId, appPosterAccountId, posterAccountId])
+}
+
+model User {
+  id                String       @id @default(uuid())
+  organizationId    String
+  username          String       @unique
+  passwordHash      String
+  role              Role
+  label             String?
+  posterAccountId   Int?
+  isActive          Boolean      @default(true)
+  lastLogin         DateTime?
+  createdAt         DateTime     @default(now())
+  
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model PosterAccount {
+  id              Int          @id @default(autoincrement())
+  organizationId  String
+  accountName     String
+  posterToken     String
+  posterUserId    String
+  posterBaseUrl   String
+  isPrimary       Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, accountName])
+}
+
+model ExpenseDraft {
+  id                    Int              @id @default(autoincrement())
+  organizationId        String
+  amount                Decimal          @db.Decimal(12, 2)
+  posterAmount          Float?
+  description           String
+  expenseType           ExpenseType      @default(TRANSACTION)
+  category              String?
+  source                ExpenseSource    @default(CASH)
+  accountId             Int?
+  posterAccountId       Int?
+  posterTransactionId   String?
+  isIncome              Boolean          @default(false)
+  completionStatus      CompletionStatus @default(PENDING)
+  status                String           @default("pending")
+  createdAt             DateTime         @default(now())
+  processedAt           DateTime?
+
+  organization          Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  supplyDrafts          SupplyDraft[]
+}
+
+model SupplyDraft {
+  id                    Int           @id @default(autoincrement())
+  organizationId        String
+  supplierName          String?
+  supplierId            Int?
+  invoiceDate           DateTime?     @db.Date
+  totalSum              Decimal?      @db.Decimal(12, 2)
+  source                ExpenseSource @default(CASH)
+  status                String        @default("pending")
+  linkedExpenseDraftId  Int?
+  ocrText               String?
+  createdAt             DateTime      @default(now())
+  processedAt           DateTime?
+
+  organization          Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  linkedExpense         ExpenseDraft? @relation(fields: [linkedExpenseDraftId], references: [id], onDelete: SetNull)
+  items                 SupplyDraftItem[]
+}
+
+model SupplyDraftItem {
+  id                    Int         @id @default(autoincrement())
+  supplyDraftId         Int
+  itemName              String
+  quantity              Decimal     @default(1.0) @db.Decimal(10, 3)
+  unit                  String      @default("шт")
+  pricePerUnit          Decimal     @default(0.0) @db.Decimal(12, 2)
+  total                 Decimal     @default(0.0) @db.Decimal(12, 2)
+  posterIngredientId    Int?
+  posterIngredientName  String?
+  itemType              ItemType?
+  posterAccountId       Int?
+  posterAccountName     String?
+  storageId             Int?
+  storageName           String?
+
+  supplyDraft           SupplyDraft @relation(fields: [supplyDraftId], references: [id], onDelete: Cascade)
+}
+
+model ShiftClosing {
+  id                    Int          @id @default(autoincrement())
+  organizationId        String
+  date                  DateTime     @db.Date
+  posterAccountId       Int?
+  wolt                  Float        @default(0)
+  halyk                 Float        @default(0)
+  kaspi                 Float        @default(0)
+  kaspiCafe             Float        @default(0)
+  kaspiPizzburg         Float        @default(0)
+  cashBills             Float        @default(0)
+  cashCoins             Float        @default(0)
+  shiftStart            Float        @default(0)
+  deposits              Float        @default(0)
+  expenses              Float        @default(0)
+  cashToLeave           Float        @default(15000)
+  posterTrade           Float        @default(0)
+  posterBonus           Float        @default(0)
+  posterCard            Float        @default(0)
+  posterCash            Float        @default(0)
+  transactionsCount     Int          @default(0)
+  factCashless          Float        @default(0)
+  factTotal             Float        @default(0)
+  factAdjusted          Float        @default(0)
+  posterTotal           Float        @default(0)
+  dayResult             Float        @default(0)
+  shiftLeft             Float        @default(0)
+  collection            Float        @default(0)
+  cashlessDiff          Float        @default(0)
+  salariesCreated       Boolean      @default(false)
+  salariesData          String?      // JSON
+  transfersCreated      Boolean      @default(false)
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, date, posterAccountId])
+}
+
+model CashierShiftData {
+  id                    Int          @id @default(autoincrement())
+  organizationId        String
+  date                  DateTime     @db.Date
+  cashierCount          Int?
+  cashierNames          String?      // JSON
+  assistantStartTime    String?
+  donerName             String?
+  assistantName         String?
+  salariesData          String?      // JSON
+  salariesCreated       Boolean      @default(false)
+  wolt                  Float        @default(0)
+  halyk                 Float        @default(0)
+  cashBills             Float        @default(0)
+  cashCoins             Float        @default(0)
+  expenses              Float        @default(0)
+  shiftDataSubmitted    Boolean      @default(false)
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, date])
+}
+
+model ShiftReconciliation {
+  id                Int           @id @default(autoincrement())
+  organizationId    String
+  date              DateTime      @db.Date
+  source            ExpenseSource
+  openingBalance    Float?
+  closingBalance    Float?
+  totalDifference   Float?
+  notes             String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  organization      Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, date, source])
+}
+
+model IngredientAlias {
+  id                Int          @id @default(autoincrement())
+  organizationId    String
+  aliasText         String
+  posterItemId      Int
+  posterItemName    String
+  source            String       @default("user")
+  notes             String?
+  createdAt         DateTime     @default(now())
+
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, aliasText])
+}
+
+model SupplierAlias {
+  id                  Int          @id @default(autoincrement())
+  organizationId      String
+  aliasText           String
+  posterSupplierId    Int
+  posterSupplierName  String
+  notes               String?
+  createdAt           DateTime     @default(now())
+
+  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, aliasText])
+}
+
+model IngredientPriceHistory {
+  id                Int          @id @default(autoincrement())
+  organizationId    String
+  ingredientId      Int
+  ingredientName    String?
+  supplierId        Int?
+  supplierName      String?
+  date              DateTime     @db.Date
+  price             Decimal      @db.Decimal(10, 2)
+  quantity          Decimal?     @db.Decimal(10, 3)
+  unit              String?
+  supplyId          Int?
+  createdAt         DateTime     @default(now())
+
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model ShipmentTemplate {
+  id                Int          @id @default(autoincrement())
+  organizationId    String
+  templateName      String
+  supplierId        Int
+  supplierName      String
+  accountId         Int
+  accountName       String
+  storageId         Int          @default(1)
+  items             String       // JSON array
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, templateName])
+}
+
+model Employee {
+  id                  Int          @id @default(autoincrement())
+  organizationId      String
+  employeeName        String
+  role                String
+  lastMentionedDate   DateTime?    @db.Date
+  createdAt           DateTime     @default(now())
+
+  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, employeeName, role])
+}
+
+model DailyTransactionLog {
+  id                Int          @id @default(autoincrement())
+  organizationId    String
+  date              DateTime     @db.Date
+  count             Int          @default(0)
+  createdAt         DateTime     @default(now())
+
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, date])
+}
+
+model DailyTransactionConfig {
+  id                Int          @id @default(autoincrement())
+  organizationId    String
+  accountName       String?
+  transactionType   Int          @default(0)
+  categoryId        Int          @default(0)
+  categoryName      String?
+  accountFromId     Int          @default(4)
+  accountFromName   String?
+  accountToId       Int?
+  accountToName     String?
+  amount            Int          @default(1)
+  comment           String?
+  isEnabled         Boolean      @default(true)
+  sortOrder         Int          @default(0)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model UserSettings {
+  organizationId        String       @id
+  language              String       @default("ru")
+  timezone              String       @default("UTC+6")
+  notificationsEnabled  Boolean      @default(true)
+
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}

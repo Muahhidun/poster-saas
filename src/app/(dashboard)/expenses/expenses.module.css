@@ -1,0 +1,400 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--foreground);
+    letter-spacing: -0.02em;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.datePicker {
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--foreground);
+    font-weight: 500;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.datePicker:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.syncBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    padding: 0.6rem 1.25rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.syncBtn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+@media (prefers-color-scheme: dark) {
+    .syncBtn {
+        background: var(--card);
+    }
+
+    .syncBtn:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: #475569;
+    }
+}
+
+.primaryBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.primaryBtn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.summaryCard {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border);
+}
+
+@media (prefers-color-scheme: dark) {
+    .summaryCard {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    }
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 1rem;
+}
+
+.cardHeader .icon {
+    color: var(--primary);
+}
+
+.balanceRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+    .balanceRow {
+        border-bottom-color: rgba(255, 255, 255, 0.05);
+    }
+}
+
+.balanceRow:last-child {
+    border-bottom: none;
+}
+
+.balanceLabel {
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+@media (prefers-color-scheme: dark) {
+    .balanceLabel {
+        color: #94a3b8;
+    }
+}
+
+.balanceValue {
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.balanceValue.negative {
+    color: var(--danger);
+}
+
+.balanceValue.positive {
+    color: var(--success);
+}
+
+.tableContainer {
+    background: var(--card);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+    .tableContainer {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    }
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.table th {
+    padding: 1rem 1.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid var(--border);
+}
+
+@media (prefers-color-scheme: dark) {
+    .table th {
+        background: rgba(255, 255, 255, 0.02);
+        color: #94a3b8;
+    }
+}
+
+.table td {
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.table tr:hover td {
+    background: rgba(0, 0, 0, 0.01);
+}
+
+@media (prefers-color-scheme: dark) {
+    .table tr:hover td {
+        background: rgba(255, 255, 255, 0.01);
+    }
+}
+
+.amount {
+    font-weight: 700;
+    color: var(--foreground);
+}
+
+.amount.income {
+    color: var(--success);
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge.source {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+@media (prefers-color-scheme: dark) {
+    .badge.source {
+        background: #334155;
+        color: #cbd5e1;
+    }
+}
+
+.badge.statusPending {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.badge.statusCompleted {
+    background: #dcfce7;
+    color: #166534;
+}
+
+@media (prefers-color-scheme: dark) {
+    .badge.statusPending {
+        background: rgba(255, 255, 255, 0.1);
+        color: #d1d5db;
+    }
+
+    .badge.statusCompleted {
+        background: rgba(34, 197, 94, 0.2);
+        color: #86efac;
+    }
+}
+
+.rowActions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.actionBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.actionBtn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--primary);
+}
+
+.actionBtn.delete:hover {
+    color: var(--danger);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .actionBtn:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Mobile Responsiveness for Expenses */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .controls {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .controls button,
+    .controls input {
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+        justify-content: center;
+    }
+
+    /* Convert table to card view on mobile */
+    .tableContainer {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+    }
+
+    .table thead {
+        display: none;
+    }
+
+    .table,
+    .table tbody,
+    .table tr,
+    .table td {
+        display: block;
+        width: 100%;
+    }
+
+    .table tr {
+        background: var(--card);
+        margin-bottom: 1rem;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        padding: 1rem;
+        position: relative;
+    }
+
+    .table td {
+        padding: 0.5rem 0;
+        border: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .table td {
+            border-bottom-color: rgba(255, 255, 255, 0.05);
+        }
+    }
+
+    .table td:last-child {
+        border-bottom: none;
+        justify-content: flex-end;
+        padding-top: 1rem;
+    }
+
+    /* Add pseudo-labels for mobile table */
+    .table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #64748b;
+        font-size: 0.85rem;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .table td::before {
+            color: #94a3b8;
+        }
+    }
+}
