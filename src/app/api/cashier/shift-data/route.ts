@@ -52,6 +52,8 @@ export async function POST(request: Request) {
                 data: {
                     wolt: role === 'CASHIER' ? Number(wolt || 0) : existing.wolt,
                     halyk: role === 'CASHIER' ? Number(halyk || 0) : existing.halyk,
+                    kaspi: role === 'CASHIER' ? Number(kaspi || 0) : existing.kaspi,
+                    kaspiCafe: role === 'CAFE' ? Number(kaspiCafe || 0) : existing.kaspiCafe,
                     cashBills: role === 'CASHIER' ? Number(cashBills || 0) : existing.cashBills,
                     cashCoins: role === 'CASHIER' ? Number(cashCoins || 0) : existing.cashCoins,
                     expenses: role === 'CASHIER' ? Number(expenses || 0) : existing.expenses,
@@ -65,6 +67,8 @@ export async function POST(request: Request) {
                     date: targetDate,
                     wolt: role === 'CASHIER' ? Number(wolt || 0) : 0,
                     halyk: role === 'CASHIER' ? Number(halyk || 0) : 0,
+                    kaspi: role === 'CASHIER' ? Number(kaspi || 0) : 0,
+                    kaspiCafe: role === 'CAFE' ? Number(kaspiCafe || 0) : 0,
                     cashBills: role === 'CASHIER' ? Number(cashBills || 0) : 0,
                     cashCoins: role === 'CASHIER' ? Number(cashCoins || 0) : 0,
                     expenses: role === 'CASHIER' ? Number(expenses || 0) : 0,
