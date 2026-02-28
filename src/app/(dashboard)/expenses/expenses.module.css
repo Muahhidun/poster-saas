@@ -144,14 +144,6 @@
     background-color: #ffedd5 !important;
 }
 
-.bgTransaction td {
-    background-color: #eff6ff !important;
-}
-
-.bgTransaction:hover td {
-    background-color: #dbeafe !important;
-}
-
 /* Custom Autocomplete */
 .categoryWrapper {
     position: relative;
