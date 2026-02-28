@@ -1,10 +1,159 @@
+/* Minimalist WeDrink-inspired Theme */
+
 .container {
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    padding-bottom: 4rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.header {
+/* Header & Controls */
+.topNav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.pageTitle {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.dateNav {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.dateBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    transition: background 0.2s;
+}
+
+.dateBtn:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.dateInput {
+    padding: 0 1rem;
+    height: 36px;
+    border: none;
+    border-left: 1px solid #e5e7eb;
+    border-right: 1px solid #e5e7eb;
+    background: transparent;
+    font-family: inherit;
+    font-weight: 600;
+    color: #111827;
+    outline: none;
+    text-align: center;
+    width: 130px;
+}
+
+/* Toolbar Config */
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.toolbarButtons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 36px;
+    padding: 0 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btnProcess {
+    background: #4f46e5;
+    color: white;
+}
+
+.btnProcess:hover:not(:disabled) {
+    background: #4338ca;
+}
+
+.btnDelete {
+    background: #fef2f2;
+    color: #ef4444;
+    border-color: #fee2e2;
+}
+
+.btnDelete:hover:not(:disabled) {
+    background: #fee2e2;
+}
+
+.btnSync,
+.btnChecklist {
+    background: #ffffff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.btnSync:hover:not(:disabled),
+.btnChecklist:hover:not(:disabled) {
+    background: #f9fafb;
+}
+
+.selectedCount {
+    font-weight: 500;
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+/* Section styling */
+.sectionWrapper {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #f3f4f6;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.01);
+    margin-bottom: 2rem;
+}
+
+.sectionHeader {
+    padding: 1.25rem 1.5rem 0.5rem 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -12,389 +161,634 @@
     gap: 1rem;
 }
 
-.title {
-    font-size: 1.75rem;
+.sectionTitle {
+    font-size: 1.1rem;
     font-weight: 700;
-    color: var(--foreground);
-    letter-spacing: -0.02em;
-}
-
-.controls {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-}
-
-.datePicker {
-    padding: 0.6rem 1rem;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--foreground);
-    font-weight: 500;
-    font-family: inherit;
-    outline: none;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.datePicker:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-}
-
-.syncBtn {
+    color: #111827;
+    margin: 0;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: white;
-    color: var(--foreground);
-    border: 1px solid var(--border);
-    padding: 0.6rem 1.25rem;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.syncBtn:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
+.reconRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1.5rem 1.25rem 1.5rem;
+    border-bottom: 1px solid #f9fafb;
 }
 
-@media (prefers-color-scheme: dark) {
-    .syncBtn {
-        background: var(--card);
-    }
-
-    .syncBtn:hover {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: #475569;
-    }
-}
-
-.primaryBtn {
+.reconLeft {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 0.6rem 1.25rem;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.primaryBtn:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
-}
-
-.summaryGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
 }
 
-.summaryCard {
-    background: var(--card);
-    border-radius: 20px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--border);
-}
-
-@media (prefers-color-scheme: dark) {
-    .summaryCard {
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-    }
-}
-
-.cardHeader {
+.reconGroup {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.reconInputBox {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    width: 100px;
+    color: #111827;
+    font-weight: 500;
+    outline: none;
+    transition: all 0.2s;
+    text-align: right;
+    font-size: 0.85rem;
+}
+
+.reconInputBox:focus {
+    border-color: #4f46e5;
+    background: #ffffff;
+}
+
+.reconPosterVal {
+    color: #111827;
     font-weight: 600;
-    color: var(--foreground);
-    margin-bottom: 1rem;
 }
 
-.cardHeader .icon {
-    color: var(--primary);
-}
-
-.balanceRow {
+.reconRight {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #6b7280;
     display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    align-items: center;
+    gap: 0.4rem;
 }
 
-@media (prefers-color-scheme: dark) {
-    .balanceRow {
-        border-bottom-color: rgba(255, 255, 255, 0.05);
-    }
-}
-
-.balanceRow:last-child {
-    border-bottom: none;
-}
-
-.balanceLabel {
-    font-size: 0.9rem;
-    color: #64748b;
-}
-
-@media (prefers-color-scheme: dark) {
-    .balanceLabel {
-        color: #94a3b8;
-    }
-}
-
-.balanceValue {
+.reconDiffVal {
     font-weight: 600;
-    color: var(--foreground);
 }
 
-.balanceValue.negative {
-    color: var(--danger);
+.reconDiffVal.pos {
+    color: #10b981;
 }
 
-.balanceValue.positive {
-    color: var(--success);
+.reconDiffVal.neg {
+    color: #ef4444;
 }
 
-.tableContainer {
-    background: var(--card);
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+.reconDiffVal.zero {
+    color: #9ca3af;
 }
 
-@media (prefers-color-scheme: dark) {
-    .tableContainer {
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-    }
+/* Table Container */
+.tableWrapper {
+    width: 100%;
+    overflow-x: auto;
 }
 
 .table {
     width: 100%;
     border-collapse: collapse;
-    text-align: left;
+    min-width: 900px;
 }
 
 .table th {
-    padding: 1rem 1.5rem;
-    font-size: 0.85rem;
+    text-align: left;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    color: #64748b;
+    color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background: rgba(0, 0, 0, 0.02);
-    border-bottom: 1px solid var(--border);
-}
-
-@media (prefers-color-scheme: dark) {
-    .table th {
-        background: rgba(255, 255, 255, 0.02);
-        color: #94a3b8;
-    }
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .table td {
-    padding: 1rem 1.5rem;
-    font-size: 0.95rem;
-    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1.5rem;
     vertical-align: middle;
+    background: #ffffff;
+    border-bottom: 1px solid #f9fafb;
 }
 
-.table tr:last-child td {
-    border-bottom: none;
+.tableRow {
+    transition: background 0.15s;
 }
 
-.table tr:hover td {
-    background: rgba(0, 0, 0, 0.01);
+.tableRow:hover td {
+    background: #f8fafc;
 }
 
-@media (prefers-color-scheme: dark) {
-    .table tr:hover td {
-        background: rgba(255, 255, 255, 0.01);
-    }
+/* In-table form elements */
+.tdCheckbox {
+    width: 40px;
+    padding-right: 0 !important;
 }
 
-.amount {
-    font-weight: 700;
-    color: var(--foreground);
+.tdStatus {
+    width: 40px;
+    padding-left: 0 !important;
+    cursor: default;
 }
 
-.amount.income {
-    color: var(--success);
+.customCheckbox {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+    cursor: pointer;
+    accent-color: #4f46e5;
 }
 
-.badge {
-    display: inline-flex;
+.statusIcon {
+    display: flex;
     align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+}
+
+.statusIcon.completed {
+    color: #10b981;
+}
+
+.statusIcon.pending {
+    color: #d1d5db;
+}
+
+/* Functional inputs that look like text */
+.cellInput {
+    height: 32px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0 0.5rem;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #111827;
+    width: 100%;
+    outline: none;
+    background: transparent;
+    transition: all 0.15s;
+}
+
+.cellInput:hover {
+    background: #f3f4f6;
+}
+
+.cellInput:focus {
+    background: #ffffff;
+    border-color: #a5b4fc;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.inputAmount {
+    width: 100px;
+    text-align: right;
+    color: #4338ca;
+    /* Indigo text for numbers akin to WeDrink purple/blue */
     font-weight: 600;
 }
 
-.badge.source {
-    background: #f1f5f9;
-    color: #475569;
+.inputDesc {
+    min-width: 250px;
 }
 
-@media (prefers-color-scheme: dark) {
-    .badge.source {
-        background: #334155;
-        color: #cbd5e1;
-    }
+/* Type Pill */
+.typeToggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    height: 28px;
+    padding: 0 0.5rem;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #6b7280;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
 }
 
-.badge.statusPending {
+.typeToggle:hover {
     background: #f3f4f6;
+    color: #111827;
+}
+
+.typeToggle.isSupply {
+    color: #8b5cf6;
+    /* Violet */
+}
+
+/* Category select */
+.categorySelect {
+    height: 32px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
     color: #4b5563;
+    background: transparent;
+    outline: none;
+    min-width: 140px;
+    transition: all 0.15s;
+    cursor: pointer;
 }
 
-.badge.statusCompleted {
-    background: #dcfce7;
-    color: #166534;
+.categorySelect:hover {
+    background: #f3f4f6;
+    color: #111827;
 }
 
-@media (prefers-color-scheme: dark) {
-    .badge.statusPending {
-        background: rgba(255, 255, 255, 0.1);
-        color: #d1d5db;
-    }
-
-    .badge.statusCompleted {
-        background: rgba(34, 197, 94, 0.2);
-        color: #86efac;
-    }
+.categorySelect:focus {
+    background: #ffffff;
+    border-color: #a5b4fc;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
 }
 
-.rowActions {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
+/* Dept Pill */
+.deptPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    height: 28px;
+    padding: 0 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #f3f4f6;
+    background: transparent;
+    color: #4b5563;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
 }
 
-.actionBtn {
+.deptPill:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+/* Trash button */
+.trashBtn {
     background: transparent;
     border: none;
+    color: #d1d5db;
     cursor: pointer;
-    color: #94a3b8;
-    padding: 0.5rem;
-    border-radius: 8px;
-    transition: all 0.2s;
+    padding: 0.4rem;
+    border-radius: 6px;
+    transition: all 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.actionBtn:hover {
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--primary);
+.trashBtn:hover {
+    color: #ef4444;
+    background: #fef2f2;
 }
 
-.actionBtn.delete:hover {
-    color: var(--danger);
-    background: rgba(239, 68, 68, 0.1);
+/* "New Row" */
+.newRowTemplate td {
+    border-bottom: none;
 }
 
+.newRowTemplate .cellInput,
+.newRowTemplate .categorySelect {
+    color: #9ca3af;
+}
+
+.newRowTemplate .cellInput:focus,
+.newRowTemplate .categorySelect:focus,
+.newRowTemplate .cellInput:hover,
+.newRowTemplate .categorySelect:hover {
+    color: #111827;
+}
+
+/* Totals Footer */
+.sectionFooter {
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.totalStats {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.totalAmount {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+    margin-left: 0.5rem;
+}
+
+/* Modal - Minimalist */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(17, 24, 39, 0.4);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modalContent {
+    background: #ffffff;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+}
+
+.modalHeader {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modalHeader h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.modalBody {
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.modalFooter {
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* Fixes for dark mode to force light styling as requested by WeDrink clone approach, or adapt it gracefully. */
 @media (prefers-color-scheme: dark) {
-    .actionBtn:hover {
-        background: rgba(255, 255, 255, 0.1);
+    .container {
+        color: #f9fafb;
+    }
+
+    .pageTitle {
+        color: #f9fafb;
+    }
+
+    .sectionWrapper {
+        background: #1f2937;
+        border-color: #374151;
+    }
+
+    .sectionTitle {
+        color: #f9fafb;
+    }
+
+    .reconInputBox {
+        background: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+
+    .reconRow {
+        border-color: #374151;
+    }
+
+    .table th {
+        background: #111827;
+        border-color: #374151;
+        color: #9ca3af;
+    }
+
+    .table td {
+        background: #1f2937;
+        border-color: #374151;
+    }
+
+    .tableRow:hover td {
+        background: #374151;
+    }
+
+    .cellInput {
+        color: #f9fafb;
+    }
+
+    .cellInput:hover {
+        background: #374151;
+    }
+
+    .inputAmount {
+        color: #818cf8;
+    }
+
+    .btnSync,
+    .btnChecklist,
+    .dateNav {
+        background: #1f2937;
+        border-color: #4b5563;
+        color: #e5e7eb;
+    }
+
+    .dateBtn:hover {
+        background: #374151;
+        color: #f9fafb;
+    }
+
+    .dateInput {
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+
+    .typeToggle:hover {
+        background: #374151;
+        color: #f9fafb;
+    }
+
+    .categorySelect {
+        color: #e5e7eb;
+    }
+
+    .categorySelect:hover {
+        background: #374151;
+        color: #f9fafb;
+    }
+
+    .totalAmount {
+        color: #f9fafb;
+    }
+
+    .modalContent {
+        background: #1f2937;
+    }
+
+    .modalHeader,
+    .modalFooter {
+        border-color: #374151;
+    }
+
+    .modalHeader h2 {
+        color: #f9fafb;
     }
 }
 
-/* Mobile Responsiveness for Expenses */
+/* Mobile Responsiveness - No horizontal scroll */
 @media (max-width: 768px) {
-    .header {
+    .container {
+        padding-bottom: 5rem;
+        gap: 1rem;
+    }
+
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .toolbarButtons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .btnProcess {
+        grid-column: span 2;
+    }
+
+    .sectionHeader {
+        padding: 1rem;
+    }
+
+    .reconRow {
         flex-direction: column;
         align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1rem;
     }
 
-    .controls {
-        flex-wrap: wrap;
+    .tableWrapper {
+        overflow-x: hidden;
+        padding: 0 0.5rem;
+    }
+
+    .table,
+    .table tbody,
+    .table tr {
+        display: block;
         width: 100%;
-    }
-
-    .controls button,
-    .controls input {
-        flex: 1;
-        min-width: 120px;
-        text-align: center;
-        justify-content: center;
-    }
-
-    /* Convert table to card view on mobile */
-    .tableContainer {
-        background: transparent;
-        border: none;
-        box-shadow: none;
     }
 
     .table thead {
         display: none;
     }
 
-    .table,
-    .table tbody,
-    .table tr,
+    .tableRow {
+        position: relative;
+        padding: 2.5rem 1rem 1rem 1.5rem;
+        margin-bottom: 0.75rem;
+        background: #ffffff;
+        border: 1px solid #f3f4f6;
+        border-radius: 12px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .newRowTemplate {
+        background: rgba(249, 250, 251, 0.5);
+        border: 1px dashed #e5e7eb;
+    }
+
     .table td {
         display: block;
-        width: 100%;
-    }
-
-    .table tr {
-        background: var(--card);
-        margin-bottom: 1rem;
-        border-radius: 16px;
-        border: 1px solid var(--border);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-        padding: 1rem;
-        position: relative;
-    }
-
-    .table td {
-        padding: 0.5rem 0;
+        padding: 0.3rem 0;
         border: none;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
+        width: 100%;
+        background: transparent !important;
     }
 
-    @media (prefers-color-scheme: dark) {
-        .table td {
-            border-bottom-color: rgba(255, 255, 255, 0.05);
-        }
+    .tableRow:hover td {
+        background: transparent !important;
     }
 
-    .table td:last-child {
-        border-bottom: none;
-        justify-content: flex-end;
-        padding-top: 1rem;
+    /* Position Absolute Elements */
+    .tdCheckbox {
+        position: absolute;
+        top: 0.85rem;
+        left: 1rem;
+        width: auto !important;
     }
 
-    /* Add pseudo-labels for mobile table */
-    .table td::before {
-        content: attr(data-label);
-        font-weight: 600;
-        color: #64748b;
-        font-size: 0.85rem;
+    .tdStatus {
+        position: absolute;
+        top: 0.85rem;
+        left: 3rem;
+        width: auto !important;
     }
 
-    @media (prefers-color-scheme: dark) {
-        .table td::before {
-            color: #94a3b8;
-        }
+    .tableRow td:last-child {
+        position: absolute;
+        top: 0.6rem;
+        right: 0.5rem;
+        width: auto !important;
+    }
+
+    /* Inputs */
+    .inputAmount {
+        width: 100%;
+        text-align: left;
+        font-size: 1.1rem;
+        padding-left: 0;
+    }
+
+    .inputDesc {
+        min-width: unset;
+        width: 100%;
+        padding-left: 0;
+    }
+
+    .categorySelect {
+        min-width: unset;
+        width: 100%;
+        padding-left: 0;
+    }
+
+    /* Grid for bottom pills */
+    .tableRow td:nth-child(5),
+    /* Type */
+    .tableRow td:nth-child(6),
+    /* Category */
+    .tableRow td:nth-child(7)
+
+    /* Dept */
+        {
+        display: inline-block;
+        width: auto;
+        margin-right: 0.5rem;
+        vertical-align: middle;
+    }
+
+    .sectionFooter {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1rem;
     }
 }
