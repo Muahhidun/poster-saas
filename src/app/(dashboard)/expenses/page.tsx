@@ -58,6 +58,23 @@ export default function ExpensesPage() {
         halyk: { amount: '', description: '', expenseType: 'TRANSACTION', category: '', posterAccountId: undefined }
     });
 
+    // Autocomplete & Sorting & Refs
+    const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
+    const [openCatId, setOpenCatId] = useState<number | string | null>(null);
+    const [catSearch, setCatSearch] = useState('');
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Click outside to close category dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setOpenCatId(null);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     // Fetch Logic
     const fetchData = async (silent = false) => {
         if (!silent) setIsLoading(true);
@@ -277,6 +294,17 @@ export default function ExpensesPage() {
         setChecklistLoading(false);
     };
 
+    const handleSort = (key: string) => {
+        let direction: 'asc' | 'desc' = 'asc';
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
+        setSortConfig({ key, direction });
+    };
+
+    const SortIcon = ({ columnKey }: { columnKey: string }) => {
+        if (!sortConfig || sortConfig.key !== columnKey) return <span className={styles.sortIcon}>↕</span>;
+        return <span className={`${styles.sortIcon} ${styles.active}`}>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>;
+    };
+
     const renderTable = (drafts: Expense[], sourceKey: string) => {
         let totalRecords = drafts.length;
         let transCount = drafts.filter(d => d.expenseType !== 'SUPPLY').length;
@@ -286,26 +314,59 @@ export default function ExpensesPage() {
         const rowColorClass = sourceKey === 'cash' ? styles.rowCash : sourceKey === 'kaspi' ? styles.rowKaspi : styles.rowHalyk;
         const allRowSelected = drafts.length > 0 && drafts.every(d => selectedIds.has(d.id));
 
+        // Apply Sorting
+        let sortedDrafts = [...drafts];
+        if (sortConfig) {
+            sortedDrafts.sort((a, b) => {
+                let valA: any = a[sortConfig.key as keyof Expense];
+                let valB: any = b[sortConfig.key as keyof Expense];
+
+                if (sortConfig.key === 'category') {
+                    valA = a.category?.toLowerCase() || '';
+                    valB = b.category?.toLowerCase() || '';
+                } else if (sortConfig.key === 'description') {
+                    valA = a.description?.toLowerCase() || '';
+                    valB = b.description?.toLowerCase() || '';
+                } else if (sortConfig.key === 'amount') {
+                    valA = Number(a.amount);
+                    valB = Number(b.amount);
+                } else if (sortConfig.key === 'expenseType') {
+                    valA = a.expenseType;
+                    valB = b.expenseType;
+                } else if (sortConfig.key === 'posterAccountId') {
+                    valA = posterAccounts.find(p => p.id === a.posterAccountId)?.name || '';
+                    valB = posterAccounts.find(p => p.id === b.posterAccountId)?.name || '';
+                } else if (sortConfig.key === 'selected') {
+                    valA = selectedIds.has(a.id) ? 1 : 0;
+                    valB = selectedIds.has(b.id) ? 1 : 0;
+                }
+
+                if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
         return (
             <div>
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th className={styles.tdCheckbox}>
-                                <input type="checkbox" className={styles.customCheckbox} checked={allRowSelected} onChange={() => toggleSelectAll(drafts)} />
+                            <th className={`${styles.tdCheckbox} ${styles.sortableHeader}`} onClick={() => handleSort('selected')}>
+                                <input type="checkbox" className={styles.customCheckbox} checked={allRowSelected} onChange={(e) => { e.stopPropagation(); toggleSelectAll(drafts); }} />
                             </th>
                             <th className={styles.tdStatus}></th>
-                            <th>Сумма</th>
-                            <th>Описание</th>
-                            <th>Тип</th>
-                            <th>Категория</th>
-                            <th>Отдел</th>
+                            <th className={styles.sortableHeader} onClick={() => handleSort('amount')}>Сумма <SortIcon columnKey="amount" /></th>
+                            <th className={styles.sortableHeader} onClick={() => handleSort('description')}>Описание <SortIcon columnKey="description" /></th>
+                            <th className={styles.sortableHeader} onClick={() => handleSort('expenseType')}>Тип <SortIcon columnKey="expenseType" /></th>
+                            <th className={styles.sortableHeader} onClick={() => handleSort('category')}>Категория <SortIcon columnKey="category" /></th>
+                            <th className={styles.sortableHeader} onClick={() => handleSort('posterAccountId')}>Отдел <SortIcon columnKey="posterAccountId" /></th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {drafts.map(d => (
-                            <tr key={d.id} className={`${styles.tableRow} ${rowColorClass}`}>
+                        {sortedDrafts.map(d => (
+                            <tr key={d.id} className={`${styles.tableRow} ${rowColorClass} ${d.expenseType === 'SUPPLY' ? styles.bgSupply : styles.bgTransaction}`}>
                                 <td className={styles.tdCheckbox}>
                                     <input type="checkbox" className={styles.customCheckbox} checked={selectedIds.has(d.id)} onChange={() => toggleSelect(d.id)} />
                                 </td>
@@ -340,15 +401,48 @@ export default function ExpensesPage() {
                                         {d.expenseType === 'SUPPLY' ? <><Box size={14} /> поставка</> : <><DollarSign size={14} /> транзакция</>}
                                     </button>
                                 </td>
-                                <td>
+                                <td style={{ position: 'relative' }}>
                                     <input
-                                        list="categories-datalist"
+                                        type="text"
                                         className={styles.categorySelect}
                                         placeholder="-- Категория --"
-                                        value={d.category || ''}
-                                        onChange={e => handleUpdateField(d.id, 'category', e.target.value)}
-                                        onBlur={e => handleBlurSave(d.id, 'category', e.target.value)}
+                                        value={openCatId === d.id ? catSearch : (d.category || '')}
+                                        onFocus={() => { setOpenCatId(d.id); setCatSearch(d.category || ''); }}
+                                        onChange={e => setCatSearch(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                const matches = categories.filter(c => (c.category_name || c.name || '').toLowerCase().includes(catSearch.toLowerCase()));
+                                                if (matches.length > 0) {
+                                                    const catName = matches[0].category_name || matches[0].name;
+                                                    handleUpdateField(d.id, 'category', catName);
+                                                    handleBlurSave(d.id, 'category', catName);
+                                                    setOpenCatId(null);
+                                                }
+                                            }
+                                        }}
                                     />
+                                    {openCatId === d.id && (
+                                        <div className={styles.categoryDropdown} ref={dropdownRef}>
+                                            {categories.filter(c => (c.category_name || c.name || '').toLowerCase().includes(catSearch.toLowerCase())).map((c, i) => (
+                                                <div
+                                                    key={`cat-${c.category_id}-${i}`}
+                                                    className={styles.categoryOption}
+                                                    onMouseDown={(e) => {
+                                                        e.preventDefault();
+                                                        const catName = c.category_name || c.name;
+                                                        handleUpdateField(d.id, 'category', catName);
+                                                        handleBlurSave(d.id, 'category', catName);
+                                                        setOpenCatId(null);
+                                                    }}
+                                                >
+                                                    {c.category_name || c.name} <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>({c.poster_account_name})</span>
+                                                </div>
+                                            ))}
+                                            {categories.filter(c => (c.category_name || c.name || '').toLowerCase().includes(catSearch.toLowerCase())).length === 0 && (
+                                                <div className={styles.categoryOption} style={{ opacity: 0.5 }}>Нет совпадений</div>
+                                            )}
+                                        </div>
+                                    )}
                                 </td>
                                 <td>
                                     <button
@@ -407,15 +501,43 @@ export default function ExpensesPage() {
                                     {newRows[sourceKey].expenseType === 'SUPPLY' ? <><Box size={14} /> поставка</> : <><DollarSign size={14} /> транзакция</>}
                                 </button>
                             </td>
-                            <td>
+                            <td style={{ position: 'relative' }}>
                                 <input
-                                    list="categories-datalist"
+                                    type="text"
                                     className={styles.categorySelect}
                                     placeholder="-- Категория --"
-                                    value={newRows[sourceKey].category}
-                                    onChange={e => handleNewRowChange(sourceKey, 'category', e.target.value)}
-                                    onBlur={() => handleNewRowSubmit(sourceKey)}
+                                    value={openCatId === `new_${sourceKey}` ? catSearch : (newRows[sourceKey].category || '')}
+                                    onFocus={() => { setOpenCatId(`new_${sourceKey}`); setCatSearch(newRows[sourceKey].category || ''); }}
+                                    onChange={e => setCatSearch(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            const matches = categories.filter(c => (c.category_name || c.name || '').toLowerCase().includes(catSearch.toLowerCase()));
+                                            if (matches.length > 0) {
+                                                const catName = matches[0].category_name || matches[0].name;
+                                                handleNewRowChange(sourceKey, 'category', catName);
+                                                setOpenCatId(null);
+                                                handleNewRowSubmit(sourceKey);
+                                            }
+                                        }
+                                    }}
                                 />
+                                {openCatId === `new_${sourceKey}` && (
+                                    <div className={styles.categoryDropdown} ref={dropdownRef}>
+                                        {categories.filter(c => (c.category_name || c.name || '').toLowerCase().includes(catSearch.toLowerCase())).map((c, i) => (
+                                            <div
+                                                key={`new-cat-${c.category_id}-${i}`}
+                                                className={styles.categoryOption}
+                                                onMouseDown={(e) => {
+                                                    e.preventDefault();
+                                                    handleNewRowChange(sourceKey, 'category', c.category_name || c.name);
+                                                    setOpenCatId(null);
+                                                }}
+                                            >
+                                                {c.category_name || c.name} <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>({c.poster_account_name})</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </td>
                             <td>
                                 <button className={styles.deptPill} onClick={() => {
@@ -454,11 +576,7 @@ export default function ExpensesPage() {
 
     return (
         <div className={styles.container}>
-            <datalist id="categories-datalist">
-                {categories.map((c, i) => (
-                    <option key={`cat-list-${c.category_id}-${i}`} value={c.category_name || c.name} />
-                ))}
-            </datalist>
+            {/* Custom dropdown implies datalist logic not needed anymore here but let's just clear datalist render below optionally to clean DOM */}
 
             <div className={styles.topNav}>
                 <h1 className={styles.pageTitle}>Черновики расходов</h1>

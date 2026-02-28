@@ -133,9 +133,88 @@
 
 .btnSync:hover:not(:disabled),
 .btnChecklist:hover:not(:disabled) {
-    background: #f9fafb;
+    background-color: #f9fafb;
 }
 
+.bgSupply {
+    background-color: rgba(255, 165, 0, 0.1) !important;
+}
+
+.bgSupply:hover {
+    background-color: rgba(255, 165, 0, 0.15) !important;
+}
+
+.bgTransaction {
+    background-color: rgba(59, 130, 246, 0.05) !important;
+}
+
+.bgTransaction:hover {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Custom Autocomplete */
+.categoryWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.categoryDropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 250px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 100;
+    margin-top: 4px;
+}
+
+.categoryOption {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f9fafb;
+    color: #374151;
+    text-align: left;
+}
+
+.categoryOption:last-child {
+    border-bottom: none;
+}
+
+.categoryOption:hover {
+    background: #f3f4f6;
+}
+
+/* Sorting */
+.sortableHeader {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s;
+    white-space: nowrap;
+}
+
+.sortableHeader:hover {
+    color: #111827;
+}
+
+.sortIcon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 2px;
+    opacity: 0.3;
+}
+
+.sortIcon.active {
+    opacity: 1;
+    color: #4f46e5;
+}
+
+/* Cells */
 .selectedCount {
     font-weight: 500;
     color: #6b7280;

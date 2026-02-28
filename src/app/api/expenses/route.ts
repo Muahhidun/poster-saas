@@ -38,7 +38,7 @@ export async function GET(request: Request) {
 
         const drafts = await prisma.expenseDraft.findMany({
             where: draftQuery,
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'asc' }
         });
 
         // 2. Fetch Poster Accounts

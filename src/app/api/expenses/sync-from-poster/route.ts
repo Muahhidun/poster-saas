@@ -58,7 +58,7 @@ export async function POST(request: Request) {
                         continue;
                     }
 
-                    const accFromId = String(txn.account_from_id || txn.account_from);
+                    const accFromId = String(txn.account_id || txn.account_from_id || txn.account_from);
                     const compositeId = `${accFromId}_${txn.transaction_id}`;
                     processedPosterTxnIds.add(compositeId);
 
