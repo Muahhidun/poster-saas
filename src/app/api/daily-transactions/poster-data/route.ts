@@ -4,6 +4,21 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { PosterClient } from '@/lib/poster/client';
 
+const POSTER_CATEGORIES_MAP: Record<string, string> = {
+    'book_category_action_actualization': 'Актуализация',
+    'book_category_action_banking_services': 'Банковские услуги и комиссии',
+    'book_category_action_household_expenses': 'Хозяйственные расходы',
+    'book_category_action_labour_cost': 'Зарплата',
+    'book_category_action_marketing': 'Маркетинг',
+    'book_category_action_rent': 'Аренда',
+    'book_category_action_supplies': 'Поставки',
+    'book_category_action_taxes': 'Налоги',
+    'book_category_action_taxes_on_wage': 'Налоги с ЗП',
+    'book_category_action_encashment': 'Инкассация',
+    'book_category_action_withdraw_cash': 'Изъятие наличности',
+    'book_category_action_deposit_cash': 'Внесение наличности'
+};
+
 export async function GET(request: Request) {
     try {
         const session = await getServerSession(authOptions);
@@ -35,13 +50,15 @@ export async function GET(request: Request) {
             const poster = new PosterClient(account.posterToken, account.posterBaseUrl);
 
             try {
-                // 1. Fetch Categories
                 const cats = await poster.getCategories();
                 if (cats && Array.isArray(cats)) {
                     cats.forEach((c: any) => {
+                        const rawName = c.name || c.category_name;
+                        const mappedName = POSTER_CATEGORIES_MAP[rawName] || rawName;
                         allCategories.push({
                             id: c.category_id,
-                            name: c.category_name,
+                            name: mappedName,
+                            category_name: mappedName,
                             account_name: account.accountName,
                             poster_account_id: account.id
                         });

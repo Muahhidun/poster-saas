@@ -9,6 +9,21 @@ import { ExpenseType, ExpenseSource, CompletionStatus } from '@prisma/client';
 const posterCache = new Map<string, { data: any; expiry: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+const POSTER_CATEGORIES_MAP: Record<string, string> = {
+    'book_category_action_actualization': 'Актуализация',
+    'book_category_action_banking_services': 'Банковские услуги и комиссии',
+    'book_category_action_household_expenses': 'Хозяйственные расходы',
+    'book_category_action_labour_cost': 'Зарплата',
+    'book_category_action_marketing': 'Маркетинг',
+    'book_category_action_rent': 'Аренда',
+    'book_category_action_supplies': 'Поставки',
+    'book_category_action_taxes': 'Налоги',
+    'book_category_action_taxes_on_wage': 'Налоги с ЗП',
+    'book_category_action_encashment': 'Инкассация',
+    'book_category_action_withdraw_cash': 'Изъятие наличности',
+    'book_category_action_deposit_cash': 'Внесение наличности'
+};
+
 export async function GET(request: Request) {
     try {
         const session = await getServerSession(authOptions);
@@ -85,7 +100,15 @@ export async function GET(request: Request) {
 
             // Append account name to categories and accounts for UI context
             catData.forEach((c: any) => {
-                categories.push({ ...c, poster_account_id: acc.id, poster_account_name: acc.accountName });
+                const rawName = c.name || c.category_name;
+                const mappedName = POSTER_CATEGORIES_MAP[rawName] || rawName;
+                categories.push({
+                    ...c,
+                    category_name: mappedName,
+                    name: mappedName,
+                    poster_account_id: acc.id,
+                    poster_account_name: acc.accountName
+                });
             });
 
             accData.forEach((a: any) => {
