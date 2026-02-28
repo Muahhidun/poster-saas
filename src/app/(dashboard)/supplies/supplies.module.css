@@ -1,35 +1,38 @@
+/* Minimalist WeDrink-inspired Theme for Supplies */
+
 .container {
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    padding-bottom: 4rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.header {
+/* Header */
+.topNav {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
+    margin-bottom: 0.5rem;
 }
 
-.title {
+.pageTitle {
     font-size: 1.75rem;
     font-weight: 700;
-    color: var(--foreground);
+    color: #111827;
     letter-spacing: -0.02em;
-}
-
-.controls {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
+    margin: 0;
 }
 
 .primaryBtn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: var(--primary);
+    background: #4f46e5;
     color: white;
     border: none;
     padding: 0.6rem 1.25rem;
@@ -37,280 +40,335 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .primaryBtn:hover {
-    background: var(--primary-hover);
+    background: #4338ca;
     transform: translateY(-1px);
 }
 
+/* Draft Card */
 .draftCard {
-    background: var(--card);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--border);
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #f3f4f6;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.01);
+    margin-bottom: 2rem;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-}
-
-@media (prefers-color-scheme: dark) {
-    .draftCard {
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-    }
 }
 
 .draftHeader {
+    padding: 1.5rem;
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 1.5rem;
+    align-items: flex-start;
+    border-bottom: 1px solid #f9fafb;
     gap: 2rem;
+    flex-wrap: wrap;
+    background: #fcfcfc;
 }
 
 .draftMeta {
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem;
     flex: 1;
+    flex-wrap: wrap;
 }
 
 .inputGroup {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    flex: 1;
+    min-width: 200px;
 }
 
 .inputGroup label {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    color: #64748b;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-@media (prefers-color-scheme: dark) {
-    .inputGroup label {
-        color: #94a3b8;
-    }
-}
-
-.inputGroup input,
-.inputGroup select {
-    padding: 0.75rem;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--background);
-    color: var(--foreground);
-    font-size: 1rem;
+.controlInput {
+    height: 36px;
+    padding: 0 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    color: #111827;
+    font-size: 0.9rem;
+    font-weight: 500;
     outline: none;
     transition: all 0.2s;
+    font-family: inherit;
 }
 
-.inputGroup input:focus,
-.inputGroup select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+.controlInput:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
 }
 
 .draftTotal {
     text-align: right;
-    min-width: 200px;
+    min-width: 150px;
 }
 
 .totalLabel {
-    font-size: 0.9rem;
-    color: #64748b;
-    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-weight: 600;
 }
 
-@media (prefers-color-scheme: dark) {
-    .totalLabel {
-        color: #94a3b8;
-    }
-}
-
 .totalValue {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 800;
-    color: var(--foreground);
+    color: #111827;
     letter-spacing: -0.05em;
 }
 
+/* Items Section */
 .itemsSection {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
 }
 
-.sectionTitle {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--foreground);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.tableWrapper {
+    width: 100%;
+    overflow-x: auto;
 }
 
 .table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 800px;
 }
 
 .table th {
-    padding: 1rem;
-    font-size: 0.85rem;
+    text-align: left;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    color: #64748b;
+    color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background: rgba(0, 0, 0, 0.02);
-    border-bottom: 1px solid var(--border);
-    text-align: left;
-}
-
-@media (prefers-color-scheme: dark) {
-    .table th {
-        background: rgba(255, 255, 255, 0.02);
-        color: #94a3b8;
-    }
+    background: #f8fafc;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .table td {
-    padding: 1rem;
-    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 1.5rem;
     vertical-align: middle;
+    background: #ffffff;
+    border-bottom: 1px solid #f9fafb;
 }
 
-.table tr:last-child td {
-    border-bottom: none;
+.tableRow {
+    transition: background 0.15s;
 }
 
-.itemInput {
+.tableRow:hover td {
+    background: #f8fafc;
+}
+
+/* Inputs styling matching Expenses */
+.cellInput {
+    height: 32px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 0 0.5rem;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #111827;
     width: 100%;
-    padding: 0.6rem;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--background);
-    color: var(--foreground);
     outline: none;
+    background: transparent;
+    transition: all 0.15s;
 }
 
-.itemInput:focus {
-    border-color: var(--primary);
+.cellInput:hover {
+    background: #f3f4f6;
 }
 
-.actionBtn {
+.cellInput:focus {
+    background: #ffffff;
+    border-color: #a5b4fc;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.inputName {
+    font-weight: 500;
+}
+
+.inputQty {
+    width: 80px;
+    text-align: right;
+    color: #0d9488;
+    /* Teal for quantity */
+    font-weight: 600;
+    padding-right: 0.25rem;
+}
+
+.inputPrice {
+    width: 100px;
+    text-align: right;
+    color: #4338ca;
+    /* Indigo for price */
+    font-weight: 600;
+}
+
+.readonlySum {
+    font-weight: 600;
+    color: #111827;
+    text-align: right;
+    display: block;
+}
+
+.priceHint {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    display: block;
+    margin-top: 0.2rem;
+    text-align: right;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.priceHint:hover {
+    color: #4f46e5;
+    text-decoration: underline;
+}
+
+.typeBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.typeBadge.product {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+/* Dept Pill */
+.deptPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    height: 28px;
+    padding: 0 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #f3f4f6;
+    background: #f9fafb;
+    color: #4b5563;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Action Buttons */
+.trashBtn {
     background: transparent;
     border: none;
+    color: #d1d5db;
     cursor: pointer;
-    color: #94a3b8;
-    padding: 0.5rem;
-    border-radius: 8px;
-    transition: all 0.2s;
+    padding: 0.4rem;
+    border-radius: 6px;
+    transition: all 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.actionBtn:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--danger);
+.trashBtn:hover {
+    color: #ef4444;
+    background: #fef2f2;
 }
 
-.addItemBtn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--primary);
-    background: transparent;
-    border: 1px dashed var(--primary);
-    padding: 1rem;
-    border-radius: 12px;
-    width: 100%;
-    justify-content: center;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
+/* New Row Template */
+.newRowTemplate td {
+    border-bottom: none;
+    background: rgba(249, 250, 251, 0.5) !important;
 }
 
-.addItemBtn:hover {
-    background: rgba(59, 130, 246, 0.05);
+.newRowTemplate .cellInput {
+    color: #9ca3af;
 }
 
+.newRowTemplate .cellInput:focus,
+.newRowTemplate .cellInput:hover {
+    color: #111827;
+}
+
+/* Footer Actions */
 .footerActions {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
+    padding: 1.5rem;
+    border-top: 1px solid #f3f4f6;
+    background: #fcfcfc;
 }
 
-.secondaryBtn {
-    padding: 0.8rem 1.5rem;
-    border-radius: 12px;
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 38px;
+    padding: 0 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
     font-weight: 600;
-    background: transparent;
-    color: var(--foreground);
-    border: 1px solid var(--border);
     cursor: pointer;
+    border: 1px solid transparent;
     transition: all 0.2s;
 }
 
-.secondaryBtn:hover {
-    background: rgba(0, 0, 0, 0.05);
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
-@media (prefers-color-scheme: dark) {
-    .secondaryBtn:hover {
-        background: rgba(255, 255, 255, 0.05);
-    }
-}
-
-.successBtn {
-    padding: 0.8rem 1.5rem;
-    border-radius: 12px;
-    font-weight: 600;
-    background: var(--success);
+.btnProcess {
+    background: #10b981;
     color: white;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
-.successBtn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+.btnProcess:hover:not(:disabled) {
+    background: #059669;
 }
 
-/* Mobile Responsiveness for Supplies */
+.btnDelete {
+    background: #ffffff;
+    color: #ef4444;
+    border-color: #fee2e2;
+}
+
+.btnDelete:hover:not(:disabled) {
+    background: #fef2f2;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .controls {
-        width: 100%;
-    }
-
-    .controls button {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .draftCard {
-        padding: 1rem;
+    .container {
+        padding-bottom: 5rem;
     }
 
     .draftHeader {
         flex-direction: column;
-        align-items: flex-start;
         gap: 1.5rem;
     }
 
@@ -320,17 +378,15 @@
         gap: 1rem;
     }
 
+    .inputGroup {
+        width: 100%;
+    }
+
     .draftTotal {
         width: 100%;
         text-align: left;
-        border-top: 1px dashed rgba(0, 0, 0, 0.1);
+        border-top: 1px dashed #e5e7eb;
         padding-top: 1rem;
-    }
-
-    @media (prefers-color-scheme: dark) {
-        .draftTotal {
-            border-top-color: rgba(255, 255, 255, 0.1);
-        }
     }
 
     .footerActions {
@@ -342,9 +398,10 @@
         justify-content: center;
     }
 
-    /* Table to Card conversion */
-    .table thead {
-        display: none;
+    /* Stacked Cards for Table */
+    .tableWrapper {
+        overflow-x: hidden;
+        padding: 0 1rem;
     }
 
     .table,
@@ -355,48 +412,63 @@
         width: 100%;
     }
 
-    .table tr {
-        background: var(--background);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        margin-bottom: 1rem;
-        padding: 1rem;
+    .table thead {
+        display: none;
+    }
+
+    .tableRow {
         position: relative;
+        padding: 1.5rem 1rem;
+        margin-bottom: 1rem;
+        background: #ffffff;
+        border: 1px solid #f3f4f6;
+        border-radius: 12px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .newRowTemplate {
+        background: #f9fafb !important;
+        border: 1px dashed #e5e7eb;
     }
 
     .table td {
-        padding: 0.5rem 0;
+        padding: 0.3rem 0;
         border: none;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-        border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
+        background: transparent !important;
     }
 
-    @media (prefers-color-scheme: dark) {
-        .table td {
-            border-bottom-color: rgba(255, 255, 255, 0.05);
-        }
+    .tableRow:hover td {
+        background: transparent !important;
     }
 
-    .table td:last-child {
-        border-bottom: none;
-        padding-top: 1rem;
-        flex-direction: row;
-        justify-content: flex-end;
-    }
-
-    .table td::before {
-        content: attr(data-label);
+    /* Flex layout for inputs inside mobile cards */
+    .inputName {
+        font-size: 1.05rem;
         font-weight: 600;
-        color: #64748b;
-        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+        width: 100%;
     }
 
-    @media (prefers-color-scheme: dark) {
-        .table td::before {
-            color: #94a3b8;
-        }
+    .inputQty,
+    .inputPrice {
+        width: 100%;
+        text-align: left;
+    }
+
+    .readonlySum {
+        text-align: left;
+        font-size: 1.1rem;
+        margin-top: 0.5rem;
+    }
+
+    .priceHint {
+        text-align: left;
+    }
+
+    .tableRow td:last-child {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: auto !important;
     }
 }

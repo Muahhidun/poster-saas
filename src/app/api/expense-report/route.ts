@@ -43,7 +43,7 @@ export async function GET(request: Request) {
 
         // Helper
         const buildSection = (title: string, items: any[]) => {
-            if (items.length === 0) return `${title}\nПусто\n\n`;
+            if (items.length === 0) return { text: `${title}\nПусто\n\n`, net: 0 };
 
             let lines = `${title}\n`;
             let incTotal = 0;
