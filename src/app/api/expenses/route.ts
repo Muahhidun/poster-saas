@@ -85,9 +85,7 @@ export async function GET(request: Request) {
 
             // Append account name to categories and accounts for UI context
             catData.forEach((c: any) => {
-                if (String(c.type) === '1') {
-                    categories.push({ ...c, poster_account_id: acc.id, poster_account_name: acc.accountName });
-                }
+                categories.push({ ...c, poster_account_id: acc.id, poster_account_name: acc.accountName });
             });
 
             accData.forEach((a: any) => {
