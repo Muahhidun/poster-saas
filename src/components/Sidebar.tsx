@@ -28,7 +28,7 @@ export default function Sidebar() {
         { label: 'Авто', href: '/daily-transactions', icon: Settings, roles: ['OWNER'] },
     ];
 
-    const visibleItems = navItems.filter(item => item.roles.includes(role || ''));
+    const visibleItems = navItems.filter(item => item.roles.includes((role || '').toUpperCase()));
 
     return (
         <aside className={styles.sidebar}>
