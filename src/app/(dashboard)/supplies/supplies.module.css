@@ -23,7 +23,7 @@
 .pageTitle {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--foreground);
     letter-spacing: -0.02em;
     margin: 0;
 }
@@ -50,9 +50,9 @@
 
 /* Draft Card */
 .draftCard {
-    background: #ffffff;
+    background: var(--card);
     border-radius: 12px;
-    border: 1px solid #f3f4f6;
+    border: 1px solid var(--border);
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.01);
     margin-bottom: 2rem;
@@ -65,10 +65,10 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    border-bottom: 1px solid #f9fafb;
+    border-bottom: 1px solid var(--background);
     gap: 2rem;
     flex-wrap: wrap;
-    background: #fcfcfc;
+    background: var(--background);
 }
 
 .draftMeta {
@@ -88,7 +88,7 @@
 .inputGroup label {
     font-size: 0.8rem;
     font-weight: 600;
-    color: #6b7280;
+    color: var(--foreground);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
@@ -97,9 +97,9 @@
     height: 40px;
     padding: 0 0.85rem;
     border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    background: #ffffff;
-    color: #111827;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--foreground);
     font-size: 0.95rem;
     font-weight: 500;
     outline: none;
@@ -131,7 +131,7 @@
 
 .totalLabel {
     font-size: 0.8rem;
-    color: #6b7280;
+    color: var(--foreground);
     margin-bottom: 0.25rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -141,7 +141,7 @@
 .totalValue {
     font-size: 2rem;
     font-weight: 800;
-    color: #111827;
+    color: var(--foreground);
     letter-spacing: -0.05em;
 }
 
@@ -167,18 +167,18 @@
     padding: 0.75rem 1.5rem;
     font-size: 0.7rem;
     font-weight: 600;
-    color: #6b7280;
+    color: var(--foreground);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background: #f8fafc;
-    border-bottom: 1px solid #f1f5f9;
+    background: var(--background);
+    border-bottom: 1px solid var(--border);
 }
 
 .table td {
     padding: 0.6rem 1.5rem;
     vertical-align: middle;
-    background: #ffffff;
-    border-bottom: 1px solid #f9fafb;
+    background: var(--card);
+    border-bottom: 1px solid var(--background);
 }
 
 .tableRow {
@@ -186,31 +186,31 @@
 }
 
 .tableRow:hover td {
-    background: #f8fafc;
+    background: var(--background);
 }
 
 /* Inputs styling matching Expenses */
 .cellInput {
     height: 32px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 0 0.5rem;
     font-family: inherit;
     font-size: 0.85rem;
     font-weight: 500;
-    color: #111827;
+    color: var(--foreground);
     width: 100%;
     outline: none;
-    background: #ffffff;
+    background: var(--card);
     transition: all 0.15s;
 }
 
 .cellInput:hover {
-    background: #f3f4f6;
+    background: var(--border);
 }
 
 .cellInput:focus {
-    background: #ffffff;
+    background: var(--card);
     border-color: #a5b4fc;
     box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
 }
@@ -238,14 +238,14 @@
 
 .readonlySum {
     font-weight: 600;
-    color: #111827;
+    color: var(--foreground);
     text-align: right;
     display: block;
 }
 
 .priceHint {
     font-size: 0.7rem;
-    color: #9ca3af;
+    color: var(--foreground);
     display: block;
     margin-top: 0.2rem;
     text-align: right;
@@ -267,8 +267,8 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background: #f3f4f6;
-    color: #4b5563;
+    background: var(--border);
+    color: var(--foreground);
 }
 
 .typeBadge.product {
@@ -284,9 +284,9 @@
     height: 28px;
     padding: 0 0.5rem;
     border-radius: 6px;
-    border: 1px solid #f3f4f6;
-    background: #f9fafb;
-    color: #4b5563;
+    border: 1px solid var(--border);
+    background: var(--background);
+    color: var(--foreground);
     font-size: 0.75rem;
     font-weight: 500;
 }
@@ -295,7 +295,7 @@
 .trashBtn {
     background: transparent;
     border: none;
-    color: #d1d5db;
+    color: var(--foreground);
     cursor: pointer;
     padding: 0.4rem;
     border-radius: 6px;
@@ -317,14 +317,14 @@
 }
 
 .newRowTemplate .cellInput {
-    color: #4b5563;
-    border: 1px solid #e5e7eb;
-    background: #ffffff;
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    background: var(--card);
 }
 
 .newRowTemplate .cellInput:focus,
 .newRowTemplate .cellInput:hover {
-    color: #111827;
+    color: var(--foreground);
     border-color: #a5b4fc;
 }
 
@@ -334,8 +334,8 @@
     justify-content: flex-end;
     gap: 1rem;
     padding: 1.5rem;
-    border-top: 1px solid #f3f4f6;
-    background: #fcfcfc;
+    border-top: 1px solid var(--border);
+    background: var(--background);
 }
 
 .addItemBtn {
@@ -388,7 +388,7 @@
 }
 
 .btnDelete {
-    background: #ffffff;
+    background: var(--card);
     color: #ef4444;
     border-color: #fee2e2;
 }
@@ -421,7 +421,7 @@
     .draftTotal {
         width: 100%;
         text-align: left;
-        border-top: 1px dashed #e5e7eb;
+        border-top: 1px dashed var(--border);
         padding-top: 1rem;
     }
 
@@ -456,15 +456,15 @@
         position: relative;
         padding: 1.5rem 1rem;
         margin-bottom: 1rem;
-        background: #ffffff;
-        border: 1px solid #f3f4f6;
+        background: var(--card);
+        border: 1px solid var(--border);
         border-radius: 12px;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
     }
 
     .newRowTemplate {
-        background: #f9fafb !important;
-        border: 1px dashed #e5e7eb;
+        background: var(--background) !important;
+        border: 1px dashed var(--border);
     }
 
     .table td {
@@ -522,8 +522,8 @@
     right: 0;
     max-height: 250px;
     overflow-y: auto;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 8px;
     margin-top: 0.25rem;
     z-index: 50;
@@ -534,13 +534,13 @@
     padding: 0.75rem 1rem;
     cursor: pointer;
     font-size: 0.9rem;
-    color: #111827;
-    border-bottom: 1px solid #f3f4f6;
+    color: var(--foreground);
+    border-bottom: 1px solid var(--border);
     transition: background 0.15s;
 }
 
 .supplierOption:hover {
-    background: #f3f4f6;
+    background: var(--border);
 }
 
 .supplierOption:last-child {

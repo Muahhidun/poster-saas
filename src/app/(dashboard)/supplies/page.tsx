@@ -48,6 +48,10 @@ export default function SuppliesPage() {
     const [openSupplierId, setOpenSupplierId] = useState<number | null>(null);
     const [supplierSearch, setSupplierSearch] = useState('');
 
+    // Ingredient Autocomplete mapping: draftId_itemId -> true/false
+    const [openItemId, setOpenItemId] = useState<string | null>(null);
+    const [itemSearch, setItemSearch] = useState('');
+
     const fetchData = async () => {
         try {
             const res = await fetch('/api/supplies');
@@ -132,6 +136,20 @@ export default function SuppliesPage() {
             }
         } catch (e) {
             console.error(e);
+        }
+    };
+
+    // -------- MATH PARSER --------
+    const parseMath = (val: string | number): number => {
+        if (typeof val === 'number') return val;
+        try {
+            const sanitized = val.toString().replace(/,/g, '.').replace(/[^0-9.\+\-\*\/\(\)\s]/g, '');
+            if (!sanitized) return 0;
+            // eslint-disable-next-line no-new-func
+            const result = new Function('return ' + sanitized)();
+            return isNaN(result) ? 0 : Number(result);
+        } catch {
+            return Number(val) || 0;
         }
     };
 
@@ -401,37 +419,98 @@ export default function SuppliesPage() {
                                 {draft.items.map(item => (
                                     <tr key={item.id} className={styles.tableRow}>
                                         <td data-label="Позиция">
-                                            <input
-                                                className={`${styles.cellInput} ${styles.inputName}`}
-                                                list="catalog-list"
-                                                defaultValue={item.ingredient_name}
-                                                onBlur={(e) => handleItemUpdate(draft.id, item.id, 'ingredient_name', e.target.value)}
-                                            />
+                                            <div style={{ position: 'relative' }}>
+                                                <input
+                                                    className={`${styles.cellInput} ${styles.inputName}`}
+                                                    placeholder="Поиск ингредиента..."
+                                                    value={openItemId === `${draft.id}_${item.id}` ? itemSearch : (item.ingredient_name || '')}
+                                                    onFocus={() => { setOpenItemId(`${draft.id}_${item.id}`); setItemSearch(item.ingredient_name || ''); }}
+                                                    onChange={e => setItemSearch(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            const exactMatch = catalogItems.find(c => c.name.toLowerCase() === itemSearch.toLowerCase());
+                                                            handleItemUpdate(draft.id, item.id, 'ingredient_name', exactMatch ? exactMatch.name : itemSearch);
+                                                            setOpenItemId(null);
+                                                        }
+                                                    }}
+                                                    onBlur={(e) => {
+                                                        setTimeout(() => {
+                                                            if (openItemId === `${draft.id}_${item.id}`) {
+                                                                handleItemUpdate(draft.id, item.id, 'ingredient_name', itemSearch);
+                                                                setOpenItemId(null);
+                                                            }
+                                                        }, 150);
+                                                    }}
+                                                />
+                                                {openItemId === `${draft.id}_${item.id}` && (
+                                                    <div className={styles.supplierDropdown}>
+                                                        {catalogItems.filter(c => c.name.toLowerCase().includes(itemSearch.toLowerCase())).slice(0, 30).map((c) => (
+                                                            <div
+                                                                key={`cat-item-${c.id}-${c.poster_account_name}`}
+                                                                className={styles.supplierOption}
+                                                                onMouseDown={(e) => {
+                                                                    e.preventDefault();
+                                                                    handleItemUpdate(draft.id, item.id, 'ingredient_name', c.name);
+                                                                    setOpenItemId(null);
+                                                                }}
+                                                            >
+                                                                <span style={{ marginRight: '8px' }}>{c.type === 'product' ? '🥤' : '🍔'}</span>
+                                                                {c.name}
+                                                                <span style={{ opacity: 0.5, fontSize: '0.75rem', marginLeft: '6px' }}>({c.poster_account_name})</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </td>
                                         <td data-label="Кабинет">
-                                            {item.poster_account_name ? (
-                                                <span className={styles.deptPill}>{item.poster_account_name}</span>
-                                            ) : (
-                                                <span style={{ color: '#d1d5db', fontSize: '0.8rem' }}>Авто</span>
-                                            )}
+                                            <span style={{ color: '#9ca3af', fontSize: '0.8rem', fontWeight: 500 }}>
+                                                {item.poster_account_name || 'Авто'}
+                                            </span>
                                         </td>
                                         <td data-label="Кол-во">
                                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     className={`${styles.cellInput} ${styles.inputQty}`}
                                                     defaultValue={item.quantity}
-                                                    onBlur={(e) => handleItemUpdate(draft.id, item.id, 'quantity', e.target.value)}
+                                                    onFocus={e => {
+                                                        if (e.target.value === '1' || e.target.value === '0') e.target.value = '';
+                                                        e.target.select();
+                                                    }}
+                                                    onBlur={(e) => {
+                                                        let val = e.target.value;
+                                                        if (val === '') val = '1';
+                                                        const num = parseMath(val);
+                                                        e.target.value = num.toString();
+                                                        handleItemUpdate(draft.id, item.id, 'quantity', num);
+                                                    }}
+                                                    onKeyDown={e => {
+                                                        if (e.key === 'Enter') e.currentTarget.blur();
+                                                    }}
                                                 />
                                                 <span style={{ fontSize: '0.8rem', color: '#9ca3af', width: '20px' }}>{item.unit}</span>
                                             </div>
                                         </td>
                                         <td data-label="Цена">
                                             <input
-                                                type="number"
+                                                type="text"
                                                 className={`${styles.cellInput} ${styles.inputPrice}`}
                                                 defaultValue={item.price}
-                                                onBlur={(e) => handleItemUpdate(draft.id, item.id, 'price', e.target.value)}
+                                                onFocus={e => {
+                                                    if (e.target.value === '0') e.target.value = '';
+                                                    e.target.select();
+                                                }}
+                                                onBlur={(e) => {
+                                                    let val = e.target.value;
+                                                    if (val === '') val = '0';
+                                                    const num = Math.round(parseMath(val));
+                                                    e.target.value = num.toString();
+                                                    handleItemUpdate(draft.id, item.id, 'price', num);
+                                                }}
+                                                onKeyDown={e => {
+                                                    if (e.key === 'Enter') e.currentTarget.blur();
+                                                }}
                                             />
                                             {item.ingredient_id && (
                                                 <span className={styles.priceHint} onClick={async () => {

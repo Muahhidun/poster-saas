@@ -12,22 +12,39 @@ export async function GET(request: Request) {
         }
 
         const orgId = session.user.organizationId;
-        const primaryAcc = await prisma.posterAccount.findFirst({
-            where: { organizationId: orgId, isPrimary: true }
+        const allAccs = await prisma.posterAccount.findMany({
+            where: { organizationId: orgId }
         });
 
-        if (!primaryAcc) {
+        if (allAccs.length === 0) {
             return NextResponse.json({ suppliers: [] });
         }
 
-        const client = new PosterClient(primaryAcc.posterBaseUrl, primaryAcc.posterToken);
-        const suppliers = await client.getSuppliers();
+        const suppliersMap = new Map();
 
-        const formatted = suppliers.map((s: any) => ({
-            id: parseInt(s.supplier_id),
-            name: s.supplier_name,
-            aliases: [] // In future, could merge from supplierAlias table
+        // Fetch suppliers from all connected accounts
+        await Promise.all(allAccs.map(async (acc: any) => {
+            try {
+                const client = new PosterClient(acc.posterBaseUrl, acc.posterToken);
+                const suppliers = await client.getSuppliers();
+                suppliers.forEach((s: any) => {
+                    const idText = s.supplier_id;
+                    if (!suppliersMap.has(idText)) {
+                        suppliersMap.set(idText, {
+                            id: parseInt(idText),
+                            name: s.supplier_name,
+                            poster_account_id: acc.id,
+                            poster_account_name: acc.name,
+                            aliases: []
+                        });
+                    }
+                });
+            } catch (e) {
+                console.error(`Error fetching suppliers for account ${acc.id}:`, e);
+            }
         }));
+
+        const formatted = Array.from(suppliersMap.values());
 
         return NextResponse.json({ suppliers: formatted });
 
