@@ -170,7 +170,7 @@ export default function SuppliesPage() {
 
             // If updating name, auto-link ingredient_id if matching catalog exactly
             if (field === 'ingredient_name' || field === 'item_name') {
-                const matched = catalogItems.find(c => c.name.toLowerCase() === value.toLowerCase());
+                const matched = catalogItems.find(c => c.name.toLocaleLowerCase('ru-RU') === value.toLocaleLowerCase('ru-RU'));
                 if (matched) {
                     payload.ingredient_id = matched.id;
                     payload.poster_account_id = matched.poster_account_id;
@@ -321,14 +321,14 @@ export default function SuppliesPage() {
                                     <div className={styles.supplierWrapper}>
                                         <input
                                             type="text"
-                                            className={`${styles.controlInput} ${draft.supplier_name && suppliers.some(s => s.name.toLowerCase() === draft.supplier_name.toLowerCase()) ? styles.inputSuccess : (draft.supplier_name ? styles.inputWarning : '')}`}
+                                            className={`${styles.controlInput} ${draft.supplier_name && suppliers.some(s => s.name.toLocaleLowerCase('ru-RU') === draft.supplier_name.toLocaleLowerCase('ru-RU')) ? styles.inputSuccess : (draft.supplier_name ? styles.inputWarning : '')}`}
                                             placeholder="Название..."
                                             value={openSupplierId === draft.id ? supplierSearch : (draft.supplier_name || '')}
                                             onFocus={() => { setOpenSupplierId(draft.id); setSupplierSearch(draft.supplier_name || ''); }}
                                             onChange={e => setSupplierSearch(e.target.value)}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') {
-                                                    const exactMatch = suppliers.find(s => s.name.toLowerCase() === supplierSearch.toLowerCase());
+                                                    const exactMatch = suppliers.find(s => s.name.toLocaleLowerCase('ru-RU') === supplierSearch.toLocaleLowerCase('ru-RU'));
                                                     updateDraftField(draft.id, 'supplier_name', exactMatch ? exactMatch.name : supplierSearch);
                                                     setOpenSupplierId(null);
                                                 }
@@ -346,7 +346,7 @@ export default function SuppliesPage() {
                                         />
                                         {openSupplierId === draft.id && (
                                             <div className={styles.supplierDropdown}>
-                                                {suppliers.filter(s => s.name.toLowerCase().includes(supplierSearch.toLowerCase())).map((s) => (
+                                                {suppliers.filter(s => s.name.toLocaleLowerCase('ru-RU').includes(supplierSearch.toLocaleLowerCase('ru-RU'))).map((s) => (
                                                     <div
                                                         key={`sup-${s.id}`}
                                                         className={styles.supplierOption}
@@ -359,7 +359,7 @@ export default function SuppliesPage() {
                                                         {s.name}
                                                     </div>
                                                 ))}
-                                                {suppliers.filter(s => s.name.toLowerCase().includes(supplierSearch.toLowerCase())).length === 0 && (
+                                                {suppliers.filter(s => s.name.toLocaleLowerCase('ru-RU').includes(supplierSearch.toLocaleLowerCase('ru-RU'))).length === 0 && (
                                                     <div className={styles.supplierOption} style={{ opacity: 0.5 }}>Нет совпадений (будет создан)</div>
                                                 )}
                                             </div>
@@ -428,7 +428,7 @@ export default function SuppliesPage() {
                                                     onChange={e => setItemSearch(e.target.value)}
                                                     onKeyDown={(e) => {
                                                         if (e.key === 'Enter') {
-                                                            const exactMatch = catalogItems.find(c => c.name.toLowerCase() === itemSearch.toLowerCase());
+                                                            const exactMatch = catalogItems.find(c => c.name.toLocaleLowerCase('ru-RU') === itemSearch.toLocaleLowerCase('ru-RU'));
                                                             handleItemUpdate(draft.id, item.id, 'ingredient_name', exactMatch ? exactMatch.name : itemSearch);
                                                             setOpenItemId(null);
                                                         }
@@ -444,7 +444,7 @@ export default function SuppliesPage() {
                                                 />
                                                 {openItemId === `${draft.id}_${item.id}` && (
                                                     <div className={styles.supplierDropdown}>
-                                                        {catalogItems.filter(c => c.name.toLowerCase().includes(itemSearch.toLowerCase())).slice(0, 30).map((c) => (
+                                                        {catalogItems.filter(c => c.name.toLocaleLowerCase('ru-RU').includes(itemSearch.toLocaleLowerCase('ru-RU'))).slice(0, 30).map((c) => (
                                                             <div
                                                                 key={`cat-item-${c.id}-${c.poster_account_name}`}
                                                                 className={styles.supplierOption}
