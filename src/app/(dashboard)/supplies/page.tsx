@@ -370,7 +370,11 @@ export default function SuppliesPage() {
                                             onFocus={() => { setOpenSupplierId(draft.id); setSupplierSearch(draft.supplier_name || ''); setSupFocusedIndex(-1); }}
                                             onChange={e => { setSupplierSearch(e.target.value); setSupFocusedIndex(-1); }}
                                             onKeyDown={(e) => {
-                                                const filtered = suppliers.filter(s => s.name.toLowerCase().includes(supplierSearch.toLowerCase()));
+                                                const searchTerms = supplierSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);
+                                                const filtered = suppliers.filter(s => {
+                                                    const nameObj = s.name.toLowerCase();
+                                                    return searchTerms.length === 0 || searchTerms.every(term => nameObj.includes(term));
+                                                });
                                                 if (e.key === 'ArrowDown') {
                                                     e.preventDefault();
                                                     setSupFocusedIndex(prev => (prev < filtered.length - 1 ? prev + 1 : prev));
@@ -401,7 +405,11 @@ export default function SuppliesPage() {
                                         />
                                         {openSupplierId === draft.id && (
                                             <div className={styles.supplierDropdown}>
-                                                {suppliers.filter(s => s.name.toLowerCase().includes(supplierSearch.toLowerCase())).map((s, idx) => (
+                                                {suppliers.filter(s => {
+                                                    const searchTerms = supplierSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);
+                                                    const nameObj = s.name.toLowerCase();
+                                                    return searchTerms.length === 0 || searchTerms.every(term => nameObj.includes(term));
+                                                }).map((s, idx) => (
                                                     <div
                                                         key={`sup-${s.id}`}
                                                         className={styles.supplierOption}
@@ -483,7 +491,11 @@ export default function SuppliesPage() {
                                                     onFocus={() => { setOpenItemId(`${draft.id}_${item.id}`); setItemSearch(item.ingredient_name || ''); setItemFocusedIndex(-1); }}
                                                     onChange={e => { setItemSearch(e.target.value); setItemFocusedIndex(-1); }}
                                                     onKeyDown={(e) => {
-                                                        const filtered = catalogItems.filter(c => c.name.toLowerCase().includes(itemSearch.toLowerCase())).slice(0, 30);
+                                                        const searchTerms = itemSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);
+                                                        const filtered = catalogItems.filter(c => {
+                                                            const nameObj = c.name.toLowerCase();
+                                                            return searchTerms.length === 0 || searchTerms.every(term => nameObj.includes(term));
+                                                        }).slice(0, 30);
                                                         if (e.key === 'ArrowDown') {
                                                             e.preventDefault();
                                                             setItemFocusedIndex(prev => (prev < filtered.length - 1 ? prev + 1 : prev));
@@ -512,7 +524,11 @@ export default function SuppliesPage() {
                                                 />
                                                 {openItemId === `${draft.id}_${item.id}` && (
                                                     <div className={styles.supplierDropdown}>
-                                                        {catalogItems.filter(c => c.name.toLowerCase().includes(itemSearch.toLowerCase())).slice(0, 30).map((c, idx) => (
+                                                        {catalogItems.filter(c => {
+                                                            const searchTerms = itemSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);
+                                                            const nameObj = c.name.toLowerCase();
+                                                            return searchTerms.length === 0 || searchTerms.every(term => nameObj.includes(term));
+                                                        }).slice(0, 30).map((c, idx) => (
                                                             <div
                                                                 key={`cat-item-${c.id}-${c.poster_account_name}`}
                                                                 className={styles.supplierOption}
@@ -618,7 +634,11 @@ export default function SuppliesPage() {
                                                 onFocus={() => { setOpenItemId(`${draft.id}_new`); setItemSearch(newRowStates[draft.id]?.ingredient_name || ''); setItemFocusedIndex(-1); }}
                                                 onChange={e => { setItemSearch(e.target.value); setItemFocusedIndex(-1); }}
                                                 onKeyDown={(e) => {
-                                                    const filtered = catalogItems.filter(c => c.name.toLowerCase().includes(itemSearch.toLowerCase())).slice(0, 30);
+                                                    const searchTerms = itemSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);
+                                                    const filtered = catalogItems.filter(c => {
+                                                        const nameObj = c.name.toLowerCase();
+                                                        return searchTerms.length === 0 || searchTerms.every(term => nameObj.includes(term));
+                                                    }).slice(0, 30);
                                                     if (e.key === 'ArrowDown') {
                                                         e.preventDefault();
                                                         setItemFocusedIndex(prev => (prev < filtered.length - 1 ? prev + 1 : prev));
@@ -651,7 +671,11 @@ export default function SuppliesPage() {
                                             />
                                             {openItemId === `${draft.id}_new` && (
                                                 <div className={styles.supplierDropdown}>
-                                                    {catalogItems.filter(c => c.name.toLowerCase().includes(itemSearch.toLowerCase())).slice(0, 30).map((c, idx) => (
+                                                    {catalogItems.filter(c => {
+                                                        const searchTerms = itemSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);
+                                                        const nameObj = c.name.toLowerCase();
+                                                        return searchTerms.length === 0 || searchTerms.every(term => nameObj.includes(term));
+                                                    }).slice(0, 30).map((c, idx) => (
                                                         <div
                                                             key={`cat-item-new-${c.id}-${c.poster_account_name}`}
                                                             className={styles.supplierOption}
