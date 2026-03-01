@@ -115,7 +115,7 @@ export class PosterClient {
 
     // --- Suppliers ---
     async getSuppliers() {
-        return this.fetch(`suppliers.getSuppliers`);
+        return this.fetch(`storage.getSuppliers`);
     }
 
     // --- Dashboard ---
