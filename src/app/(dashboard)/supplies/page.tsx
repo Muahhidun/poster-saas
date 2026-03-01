@@ -44,6 +44,10 @@ export default function SuppliesPage() {
     const [isProcessing, setIsProcessing] = useState<Record<number, boolean>>({});
     const [errorMsg, setErrorMsg] = useState('');
 
+    // Autocomplete states
+    const [openSupplierId, setOpenSupplierId] = useState<number | null>(null);
+    const [supplierSearch, setSupplierSearch] = useState('');
+
     const fetchData = async () => {
         try {
             const res = await fetch('/api/supplies');
@@ -266,12 +270,6 @@ export default function SuppliesPage() {
                 ))}
             </datalist>
 
-            <datalist id="suppliers-list">
-                {suppliers.map(s => (
-                    <option key={s.id} value={s.name} />
-                ))}
-            </datalist>
-
             <header className={styles.topNav}>
                 <h1 className={styles.pageTitle}>Поставки</h1>
                 <button className={styles.primaryBtn} onClick={handleCreateDraft}>
@@ -299,39 +297,67 @@ export default function SuppliesPage() {
                     {/* Header: Meta */}
                     <div className={styles.draftHeader}>
                         <div className={styles.draftMeta}>
-                            <div className={styles.inputGroup}>
+                            <div className={styles.inputGroup} style={{ flex: '1', minWidth: '250px' }}>
                                 <label>Поставщик</label>
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    <input
-                                        type="text"
-                                        className={styles.controlInput}
-                                        list="suppliers-list"
-                                        placeholder="Название..."
-                                        defaultValue={draft.supplier_name}
-                                        onBlur={(e) => updateDraftField(draft.id, 'supplier_name', e.target.value)}
-                                        style={{ flex: 1 }}
-                                    />
+                                <div style={{ display: 'flex', gap: '0.5rem', position: 'relative' }}>
+                                    <div className={styles.supplierWrapper}>
+                                        <input
+                                            type="text"
+                                            className={`${styles.controlInput} ${draft.supplier_name && suppliers.some(s => s.name.toLowerCase() === draft.supplier_name.toLowerCase()) ? styles.inputSuccess : (draft.supplier_name ? styles.inputWarning : '')}`}
+                                            placeholder="Название..."
+                                            value={openSupplierId === draft.id ? supplierSearch : (draft.supplier_name || '')}
+                                            onFocus={() => { setOpenSupplierId(draft.id); setSupplierSearch(draft.supplier_name || ''); }}
+                                            onChange={e => setSupplierSearch(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    const exactMatch = suppliers.find(s => s.name.toLowerCase() === supplierSearch.toLowerCase());
+                                                    updateDraftField(draft.id, 'supplier_name', exactMatch ? exactMatch.name : supplierSearch);
+                                                    setOpenSupplierId(null);
+                                                }
+                                            }}
+                                            onBlur={(e) => {
+                                                // Small delay to allow click on option to register first
+                                                setTimeout(() => {
+                                                    if (openSupplierId === draft.id) {
+                                                        updateDraftField(draft.id, 'supplier_name', supplierSearch);
+                                                        setOpenSupplierId(null);
+                                                    }
+                                                }, 150);
+                                            }}
+                                            style={{ width: '100%' }}
+                                        />
+                                        {openSupplierId === draft.id && (
+                                            <div className={styles.supplierDropdown}>
+                                                {suppliers.filter(s => s.name.toLowerCase().includes(supplierSearch.toLowerCase())).map((s) => (
+                                                    <div
+                                                        key={`sup-${s.id}`}
+                                                        className={styles.supplierOption}
+                                                        onMouseDown={(e) => {
+                                                            e.preventDefault();
+                                                            updateDraftField(draft.id, 'supplier_name', s.name);
+                                                            setOpenSupplierId(null);
+                                                        }}
+                                                    >
+                                                        {s.name}
+                                                    </div>
+                                                ))}
+                                                {suppliers.filter(s => s.name.toLowerCase().includes(supplierSearch.toLowerCase())).length === 0 && (
+                                                    <div className={styles.supplierOption} style={{ opacity: 0.5 }}>Нет совпадений (будет создан)</div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                     <button
                                         onClick={() => handleRepeatLast(draft.id, draft.supplier_id)}
                                         title="Повторить последнюю накладную"
-                                        style={{ background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '0 0.5rem', cursor: 'pointer', color: '#4b5563' }}
+                                        style={{ background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '0 0.8rem', cursor: 'pointer', color: '#4b5563', height: '40px' }}
                                     >
                                         <RefreshCcw size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className={styles.inputGroup} style={{ maxWidth: '140px' }}>
-                                <label>Дата</label>
-                                <input
-                                    type="date"
-                                    className={styles.controlInput}
-                                    defaultValue={draft.invoice_date}
-                                    onBlur={(e) => updateDraftField(draft.id, 'invoice_date', e.target.value)}
-                                />
-                            </div>
-
-                            <div className={styles.inputGroup} style={{ maxWidth: '140px' }}>
+                            <div className={styles.inputGroup} style={{ maxWidth: '160px' }}>
                                 <label>Оплата с</label>
                                 <select
                                     className={styles.controlInput}
@@ -343,24 +369,6 @@ export default function SuppliesPage() {
                                     <option value="halyk">Halyk</option>
                                 </select>
                             </div>
-
-                            <div className={styles.inputGroup} style={{ minWidth: '180px' }}>
-                                <label>Связанный расход</label>
-                                <select
-                                    className={styles.controlInput}
-                                    value={draft.linked_expense_draft_id || ''}
-                                    onChange={(e) => updateDraftField(draft.id, 'linked_expense_draft_id', e.target.value)}
-                                    style={{ fontSize: '0.8rem' }}
-                                >
-                                    <option value="">-- Нет привязки --</option>
-                                    {draft.linked_expense_draft_id && (
-                                        <option value={draft.linked_expense_draft_id}>Привязано: {draft.linked_expense_amount} ₸</option>
-                                    )}
-                                    {pendingExpenses.map(pe => (
-                                        <option key={pe.id} value={pe.id}>{pe.description} ({pe.amount} ₸)</option>
-                                    ))}
-                                </select>
-                            </div>
                         </div>
 
                         <div className={styles.draftTotal}>
@@ -368,6 +376,11 @@ export default function SuppliesPage() {
                             <div className={styles.totalValue}>
                                 {draft.total_sum.toLocaleString('ru')} <span style={{ fontSize: '1.2rem', color: '#9ca3af' }}>₸</span>
                             </div>
+                            {draft.linked_expense_draft_id && (
+                                <div style={{ fontSize: '0.75rem', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', marginTop: '4px' }}>
+                                    <span title="Связано с расходом">🔗 Из расхода</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -469,12 +482,12 @@ export default function SuppliesPage() {
 
                     {/* Footer buttons */}
                     <div className={styles.footerActions}>
-                        <button className={styles.btnDelete} onClick={() => handleDeleteDraft(draft.id)}>
+                        <button className={`${styles.btn} ${styles.btnDelete}`} onClick={() => handleDeleteDraft(draft.id)}>
                             <Trash size={16} />
                             Удалить черновик
                         </button>
                         <button
-                            className={styles.btnProcess}
+                            className={`${styles.btn} ${styles.btnProcess}`}
                             onClick={() => handleProcess(draft.id)}
                             disabled={isProcessing[draft.id] || draft.items.length === 0}
                         >
