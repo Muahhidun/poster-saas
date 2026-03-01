@@ -219,7 +219,7 @@ export default function ExpensesPage() {
         }));
     };
 
-    const handleNewRowSubmit = async (sourceKey: string) => {
+    const handleNewRowSubmit = async (sourceKey: string, overrideCategory?: string) => {
         const row = newRows[sourceKey];
         if (!row.amount || !row.description) return; // wait until filled
 
@@ -231,7 +231,7 @@ export default function ExpensesPage() {
                     amount: Number(row.amount),
                     description: row.description,
                     expense_type: row.expenseType,
-                    category: row.category,
+                    category: overrideCategory !== undefined ? overrideCategory : row.category,
                     source: sourceKey.toUpperCase(),
                     poster_account_id: row.posterAccountId,
                     is_income: false
@@ -480,7 +480,7 @@ export default function ExpensesPage() {
                                     placeholder="0"
                                     value={newRows[sourceKey].amount}
                                     onChange={e => handleNewRowChange(sourceKey, 'amount', e.target.value)}
-                                    onBlur={() => handleNewRowSubmit(sourceKey)}
+                                    onKeyDown={e => { if (e.key === 'Enter') handleNewRowSubmit(sourceKey) }}
                                 />
                             </td>
                             <td>
@@ -490,7 +490,6 @@ export default function ExpensesPage() {
                                     placeholder="Новая запись..."
                                     value={newRows[sourceKey].description}
                                     onChange={e => handleNewRowChange(sourceKey, 'description', e.target.value)}
-                                    onBlur={() => handleNewRowSubmit(sourceKey)}
                                     onKeyDown={e => { if (e.key === 'Enter') handleNewRowSubmit(sourceKey) }}
                                 />
                             </td>
@@ -516,7 +515,11 @@ export default function ExpensesPage() {
                                                 const catName = matches[0].category_name || matches[0].name;
                                                 handleNewRowChange(sourceKey, 'category', catName);
                                                 setOpenCatId(null);
-                                                handleNewRowSubmit(sourceKey);
+                                                handleNewRowSubmit(sourceKey, catName);
+                                            } else {
+                                                handleNewRowChange(sourceKey, 'category', catSearch);
+                                                setOpenCatId(null);
+                                                handleNewRowSubmit(sourceKey, catSearch);
                                             }
                                         }
                                     }}
@@ -529,8 +532,10 @@ export default function ExpensesPage() {
                                                 className={styles.categoryOption}
                                                 onMouseDown={(e) => {
                                                     e.preventDefault();
-                                                    handleNewRowChange(sourceKey, 'category', c.category_name || c.name);
+                                                    const catName = c.category_name || c.name;
+                                                    handleNewRowChange(sourceKey, 'category', catName);
                                                     setOpenCatId(null);
+                                                    handleNewRowSubmit(sourceKey, catName);
                                                 }}
                                             >
                                                 {c.category_name || c.name} <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>({c.poster_account_name})</span>
