@@ -47,10 +47,12 @@ export default function SuppliesPage() {
     // Autocomplete states
     const [openSupplierId, setOpenSupplierId] = useState<number | null>(null);
     const [supplierSearch, setSupplierSearch] = useState('');
+    const [supFocusedIndex, setSupFocusedIndex] = useState(-1);
 
     // Ingredient Autocomplete mapping: draftId_itemId -> true/false
     const [openItemId, setOpenItemId] = useState<string | null>(null);
     const [itemSearch, setItemSearch] = useState('');
+    const [itemFocusedIndex, setItemFocusedIndex] = useState(-1);
 
     // New Row states per draft
     const [newRowStates, setNewRowStates] = useState<Record<number, { ingredient_name: string; quantity: string | number; price: string | number }>>({});
@@ -163,7 +165,7 @@ export default function SuppliesPage() {
         const nameToUse = nameOverride || row.ingredient_name;
         if (!nameToUse.trim()) return;
 
-        const matched = catalogItems.find(c => c.name.toLocaleLowerCase('ru-RU') === nameToUse.toLocaleLowerCase('ru-RU'));
+        const matched = catalogItems.find(c => c.name.toLowerCase() === nameToUse.toLowerCase());
         const payload: any = {
             ingredient_name: nameToUse,
             quantity: parseMath(row.quantity),
@@ -211,7 +213,7 @@ export default function SuppliesPage() {
 
             // If updating name, auto-link ingredient_id if matching catalog exactly
             if (field === 'ingredient_name' || field === 'item_name') {
-                const matched = catalogItems.find(c => c.name.toLocaleLowerCase('ru-RU') === value.toLocaleLowerCase('ru-RU'));
+                const matched = catalogItems.find(c => c.name.toLowerCase() === value.toLowerCase());
                 if (matched) {
                     payload.ingredient_id = matched.id;
                     payload.poster_account_id = matched.poster_account_id;
@@ -362,15 +364,27 @@ export default function SuppliesPage() {
                                     <div className={styles.supplierWrapper}>
                                         <input
                                             type="text"
-                                            className={`${styles.controlInput} ${draft.supplier_name && suppliers.some(s => s.name.toLocaleLowerCase('ru-RU') === draft.supplier_name.toLocaleLowerCase('ru-RU')) ? styles.inputSuccess : (draft.supplier_name ? styles.inputWarning : '')}`}
+                                            className={`${styles.controlInput} ${draft.supplier_name && suppliers.some(s => s.name.toLowerCase() === draft.supplier_name.toLowerCase()) ? styles.inputSuccess : (draft.supplier_name ? styles.inputWarning : '')}`}
                                             placeholder="Название..."
                                             value={openSupplierId === draft.id ? supplierSearch : (draft.supplier_name || '')}
-                                            onFocus={() => { setOpenSupplierId(draft.id); setSupplierSearch(draft.supplier_name || ''); }}
-                                            onChange={e => setSupplierSearch(e.target.value)}
+                                            onFocus={() => { setOpenSupplierId(draft.id); setSupplierSearch(draft.supplier_name || ''); setSupFocusedIndex(-1); }}
+                                            onChange={e => { setSupplierSearch(e.target.value); setSupFocusedIndex(-1); }}
                                             onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    const exactMatch = suppliers.find(s => s.name.toLocaleLowerCase('ru-RU') === supplierSearch.toLocaleLowerCase('ru-RU'));
-                                                    updateDraftField(draft.id, 'supplier_name', exactMatch ? exactMatch.name : supplierSearch);
+                                                const filtered = suppliers.filter(s => s.name.toLowerCase().includes(supplierSearch.toLowerCase()));
+                                                if (e.key === 'ArrowDown') {
+                                                    e.preventDefault();
+                                                    setSupFocusedIndex(prev => (prev < filtered.length - 1 ? prev + 1 : prev));
+                                                } else if (e.key === 'ArrowUp') {
+                                                    e.preventDefault();
+                                                    setSupFocusedIndex(prev => (prev > 0 ? prev - 1 : -1));
+                                                } else if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    if (supFocusedIndex >= 0 && supFocusedIndex < filtered.length) {
+                                                        updateDraftField(draft.id, 'supplier_name', filtered[supFocusedIndex].name);
+                                                    } else {
+                                                        const exactMatch = suppliers.find(s => s.name.toLowerCase() === supplierSearch.toLowerCase());
+                                                        updateDraftField(draft.id, 'supplier_name', exactMatch ? exactMatch.name : supplierSearch);
+                                                    }
                                                     setOpenSupplierId(null);
                                                 }
                                             }}
@@ -387,10 +401,11 @@ export default function SuppliesPage() {
                                         />
                                         {openSupplierId === draft.id && (
                                             <div className={styles.supplierDropdown}>
-                                                {suppliers.filter(s => s.name.toLocaleLowerCase('ru-RU').includes(supplierSearch.toLocaleLowerCase('ru-RU'))).map((s) => (
+                                                {suppliers.filter(s => s.name.toLowerCase().includes(supplierSearch.toLowerCase())).map((s, idx) => (
                                                     <div
                                                         key={`sup-${s.id}`}
                                                         className={styles.supplierOption}
+                                                        style={{ backgroundColor: idx === supFocusedIndex ? 'var(--border)' : 'transparent' }}
                                                         onMouseDown={(e) => {
                                                             e.preventDefault();
                                                             updateDraftField(draft.id, 'supplier_name', s.name);
@@ -400,7 +415,7 @@ export default function SuppliesPage() {
                                                         {s.name}
                                                     </div>
                                                 ))}
-                                                {suppliers.filter(s => s.name.toLocaleLowerCase('ru-RU').includes(supplierSearch.toLocaleLowerCase('ru-RU'))).length === 0 && (
+                                                {suppliers.filter(s => s.name.toLowerCase().includes(supplierSearch.toLowerCase())).length === 0 && (
                                                     <div className={styles.supplierOption} style={{ opacity: 0.5 }}>Нет совпадений (будет создан)</div>
                                                 )}
                                             </div>
@@ -465,12 +480,24 @@ export default function SuppliesPage() {
                                                     className={`${styles.cellInput} ${styles.inputName}`}
                                                     placeholder="Поиск ингредиента..."
                                                     value={openItemId === `${draft.id}_${item.id}` ? itemSearch : (item.ingredient_name || '')}
-                                                    onFocus={() => { setOpenItemId(`${draft.id}_${item.id}`); setItemSearch(item.ingredient_name || ''); }}
-                                                    onChange={e => setItemSearch(e.target.value)}
+                                                    onFocus={() => { setOpenItemId(`${draft.id}_${item.id}`); setItemSearch(item.ingredient_name || ''); setItemFocusedIndex(-1); }}
+                                                    onChange={e => { setItemSearch(e.target.value); setItemFocusedIndex(-1); }}
                                                     onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            const exactMatch = catalogItems.find(c => c.name.toLocaleLowerCase('ru-RU') === itemSearch.toLocaleLowerCase('ru-RU'));
-                                                            handleItemUpdate(draft.id, item.id, 'ingredient_name', exactMatch ? exactMatch.name : itemSearch);
+                                                        const filtered = catalogItems.filter(c => c.name.toLowerCase().includes(itemSearch.toLowerCase())).slice(0, 30);
+                                                        if (e.key === 'ArrowDown') {
+                                                            e.preventDefault();
+                                                            setItemFocusedIndex(prev => (prev < filtered.length - 1 ? prev + 1 : prev));
+                                                        } else if (e.key === 'ArrowUp') {
+                                                            e.preventDefault();
+                                                            setItemFocusedIndex(prev => (prev > 0 ? prev - 1 : -1));
+                                                        } else if (e.key === 'Enter') {
+                                                            e.preventDefault();
+                                                            if (itemFocusedIndex >= 0 && itemFocusedIndex < filtered.length) {
+                                                                handleItemUpdate(draft.id, item.id, 'ingredient_name', filtered[itemFocusedIndex].name);
+                                                            } else {
+                                                                const exactMatch = catalogItems.find(c => c.name.toLowerCase() === itemSearch.toLowerCase());
+                                                                handleItemUpdate(draft.id, item.id, 'ingredient_name', exactMatch ? exactMatch.name : itemSearch);
+                                                            }
                                                             setOpenItemId(null);
                                                         }
                                                     }}
@@ -485,10 +512,11 @@ export default function SuppliesPage() {
                                                 />
                                                 {openItemId === `${draft.id}_${item.id}` && (
                                                     <div className={styles.supplierDropdown}>
-                                                        {catalogItems.filter(c => c.name.toLocaleLowerCase('ru-RU').includes(itemSearch.toLocaleLowerCase('ru-RU'))).slice(0, 30).map((c) => (
+                                                        {catalogItems.filter(c => c.name.toLowerCase().includes(itemSearch.toLowerCase())).slice(0, 30).map((c, idx) => (
                                                             <div
                                                                 key={`cat-item-${c.id}-${c.poster_account_name}`}
                                                                 className={styles.supplierOption}
+                                                                style={{ backgroundColor: idx === itemFocusedIndex ? 'var(--border)' : 'transparent' }}
                                                                 onMouseDown={(e) => {
                                                                     e.preventDefault();
                                                                     handleItemUpdate(draft.id, item.id, 'ingredient_name', c.name);
@@ -587,13 +615,25 @@ export default function SuppliesPage() {
                                                 className={`${styles.cellInput} ${styles.inputName}`}
                                                 placeholder="[Новая позиция...] Введите название"
                                                 value={openItemId === `${draft.id}_new` ? itemSearch : (newRowStates[draft.id]?.ingredient_name || '')}
-                                                onFocus={() => { setOpenItemId(`${draft.id}_new`); setItemSearch(newRowStates[draft.id]?.ingredient_name || ''); }}
-                                                onChange={e => setItemSearch(e.target.value)}
+                                                onFocus={() => { setOpenItemId(`${draft.id}_new`); setItemSearch(newRowStates[draft.id]?.ingredient_name || ''); setItemFocusedIndex(-1); }}
+                                                onChange={e => { setItemSearch(e.target.value); setItemFocusedIndex(-1); }}
                                                 onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        const exactMatch = catalogItems.find(c => c.name.toLocaleLowerCase('ru-RU') === itemSearch.toLocaleLowerCase('ru-RU'));
-                                                        const finalName = exactMatch ? exactMatch.name : itemSearch;
-                                                        submitNewRow(draft.id, finalName);
+                                                    const filtered = catalogItems.filter(c => c.name.toLowerCase().includes(itemSearch.toLowerCase())).slice(0, 30);
+                                                    if (e.key === 'ArrowDown') {
+                                                        e.preventDefault();
+                                                        setItemFocusedIndex(prev => (prev < filtered.length - 1 ? prev + 1 : prev));
+                                                    } else if (e.key === 'ArrowUp') {
+                                                        e.preventDefault();
+                                                        setItemFocusedIndex(prev => (prev > 0 ? prev - 1 : -1));
+                                                    } else if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        if (itemFocusedIndex >= 0 && itemFocusedIndex < filtered.length) {
+                                                            submitNewRow(draft.id, filtered[itemFocusedIndex].name);
+                                                        } else {
+                                                            const exactMatch = catalogItems.find(c => c.name.toLowerCase() === itemSearch.toLowerCase());
+                                                            const finalName = exactMatch ? exactMatch.name : itemSearch;
+                                                            submitNewRow(draft.id, finalName);
+                                                        }
                                                         setOpenItemId(null);
                                                     }
                                                 }}
@@ -611,10 +651,11 @@ export default function SuppliesPage() {
                                             />
                                             {openItemId === `${draft.id}_new` && (
                                                 <div className={styles.supplierDropdown}>
-                                                    {catalogItems.filter(c => c.name.toLocaleLowerCase('ru-RU').includes(itemSearch.toLocaleLowerCase('ru-RU'))).slice(0, 30).map((c) => (
+                                                    {catalogItems.filter(c => c.name.toLowerCase().includes(itemSearch.toLowerCase())).slice(0, 30).map((c, idx) => (
                                                         <div
                                                             key={`cat-item-new-${c.id}-${c.poster_account_name}`}
                                                             className={styles.supplierOption}
+                                                            style={{ backgroundColor: idx === itemFocusedIndex ? 'var(--border)' : 'transparent' }}
                                                             onMouseDown={(e) => {
                                                                 e.preventDefault();
                                                                 setNewRowStates(prev => ({
