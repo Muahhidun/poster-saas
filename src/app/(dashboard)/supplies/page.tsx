@@ -52,6 +52,9 @@ export default function SuppliesPage() {
     const [openItemId, setOpenItemId] = useState<string | null>(null);
     const [itemSearch, setItemSearch] = useState('');
 
+    // New Row states per draft
+    const [newRowStates, setNewRowStates] = useState<Record<number, { ingredient_name: string; quantity: string | number; price: string | number }>>({});
+
     const fetchData = async () => {
         try {
             const res = await fetch('/api/supplies');
@@ -154,6 +157,44 @@ export default function SuppliesPage() {
     };
 
     // -------- ITEMS CRUD --------
+
+    const submitNewRow = async (draftId: number, nameOverride?: string) => {
+        const row = newRowStates[draftId] || { ingredient_name: '', quantity: 1, price: 0 };
+        const nameToUse = nameOverride || row.ingredient_name;
+        if (!nameToUse.trim()) return;
+
+        const matched = catalogItems.find(c => c.name.toLocaleLowerCase('ru-RU') === nameToUse.toLocaleLowerCase('ru-RU'));
+        const payload: any = {
+            ingredient_name: nameToUse,
+            quantity: parseMath(row.quantity),
+            price: Math.round(parseMath(row.price))
+        };
+
+        if (matched) {
+            payload.ingredient_id = matched.id;
+            payload.poster_account_id = matched.poster_account_id;
+            payload.poster_account_name = matched.poster_account_name;
+            payload.item_type = matched.type;
+        }
+
+        // Optimistically clear the row and refocus the name input
+        setNewRowStates(prev => ({ ...prev, [draftId]: { ingredient_name: '', quantity: 1, price: 0 } }));
+        setTimeout(() => {
+            const el = document.getElementById(`new-row-name-${draftId}`);
+            if (el) el.focus();
+        }, 50);
+
+        try {
+            await fetch(`/api/supplies/${draftId}/items`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            fetchData();
+        } catch (e) {
+            console.error('Failed to add new item', e);
+        }
+    };
 
     const handleItemUpdate = async (draftId: number, itemId: number, field: string, value: any) => {
         // Optimistic
@@ -537,30 +578,120 @@ export default function SuppliesPage() {
                                     </tr>
                                 ))}
 
-                                {/* Remove newRowTemplate implicit row here */}
+                                {/* NEW ROW TEMPLATE */}
+                                <tr className={styles.tableRow}>
+                                    <td data-label="Позиция">
+                                        <div style={{ position: 'relative' }}>
+                                            <input
+                                                id={`new-row-name-${draft.id}`}
+                                                className={`${styles.cellInput} ${styles.inputName}`}
+                                                placeholder="[Новая позиция...] Введите название"
+                                                value={openItemId === `${draft.id}_new` ? itemSearch : (newRowStates[draft.id]?.ingredient_name || '')}
+                                                onFocus={() => { setOpenItemId(`${draft.id}_new`); setItemSearch(newRowStates[draft.id]?.ingredient_name || ''); }}
+                                                onChange={e => setItemSearch(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        const exactMatch = catalogItems.find(c => c.name.toLocaleLowerCase('ru-RU') === itemSearch.toLocaleLowerCase('ru-RU'));
+                                                        const finalName = exactMatch ? exactMatch.name : itemSearch;
+                                                        submitNewRow(draft.id, finalName);
+                                                        setOpenItemId(null);
+                                                    }
+                                                }}
+                                                onBlur={(e) => {
+                                                    setTimeout(() => {
+                                                        if (openItemId === `${draft.id}_new`) {
+                                                            setNewRowStates(prev => ({
+                                                                ...prev,
+                                                                [draft.id]: { ...(prev[draft.id] || { quantity: 1, price: 0 }), ingredient_name: itemSearch }
+                                                            }));
+                                                            setOpenItemId(null);
+                                                        }
+                                                    }, 150);
+                                                }}
+                                            />
+                                            {openItemId === `${draft.id}_new` && (
+                                                <div className={styles.supplierDropdown}>
+                                                    {catalogItems.filter(c => c.name.toLocaleLowerCase('ru-RU').includes(itemSearch.toLocaleLowerCase('ru-RU'))).slice(0, 30).map((c) => (
+                                                        <div
+                                                            key={`cat-item-new-${c.id}-${c.poster_account_name}`}
+                                                            className={styles.supplierOption}
+                                                            onMouseDown={(e) => {
+                                                                e.preventDefault();
+                                                                setNewRowStates(prev => ({
+                                                                    ...prev,
+                                                                    [draft.id]: { ...(prev[draft.id] || { quantity: 1, price: 0 }), ingredient_name: c.name }
+                                                                }));
+                                                                setOpenItemId(null);
+                                                            }}
+                                                        >
+                                                            <span style={{ marginRight: '8px' }}>{c.type === 'product' ? '🥤' : '🍔'}</span>
+                                                            {c.name}
+                                                            <span style={{ opacity: 0.5, fontSize: '0.75rem', marginLeft: '6px' }}>({c.poster_account_name})</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td data-label="Кабинет">
+                                        <span style={{ color: '#d1d5db', fontSize: '0.8rem' }}>Авто</span>
+                                    </td>
+                                    <td data-label="Кол-во">
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                            <input
+                                                type="text"
+                                                className={`${styles.cellInput} ${styles.inputQty}`}
+                                                value={newRowStates[draft.id]?.quantity ?? 1}
+                                                onChange={e => setNewRowStates(prev => ({ ...prev, [draft.id]: { ...(prev[draft.id] || { ingredient_name: '', price: 0 }), quantity: e.target.value } }))}
+                                                onFocus={e => {
+                                                    if (e.target.value === '1' || e.target.value === '0') setNewRowStates(prev => ({ ...prev, [draft.id]: { ...prev[draft.id], quantity: '' } }));
+                                                }}
+                                                onBlur={(e) => {
+                                                    let val = e.target.value;
+                                                    if (val === '') val = '1';
+                                                    const num = parseMath(val);
+                                                    setNewRowStates(prev => ({ ...prev, [draft.id]: { ...(prev[draft.id] || { ingredient_name: '', price: 0 }), quantity: num } }));
+                                                }}
+                                                onKeyDown={e => {
+                                                    if (e.key === 'Enter') submitNewRow(draft.id);
+                                                }}
+                                            />
+                                            <span style={{ fontSize: '0.8rem', color: '#9ca3af', width: '20px' }}>шт</span>
+                                        </div>
+                                    </td>
+                                    <td data-label="Цена">
+                                        <input
+                                            type="text"
+                                            className={`${styles.cellInput} ${styles.inputPrice}`}
+                                            value={newRowStates[draft.id]?.price ?? 0}
+                                            onChange={e => setNewRowStates(prev => ({ ...prev, [draft.id]: { ...(prev[draft.id] || { ingredient_name: '', quantity: 1 }), price: e.target.value } }))}
+                                            onFocus={e => {
+                                                if (e.target.value === '0') setNewRowStates(prev => ({ ...prev, [draft.id]: { ...prev[draft.id], price: '' } }));
+                                            }}
+                                            onBlur={(e) => {
+                                                let val = e.target.value;
+                                                if (val === '') val = '0';
+                                                const num = Math.round(parseMath(val));
+                                                setNewRowStates(prev => ({ ...prev, [draft.id]: { ...(prev[draft.id] || { ingredient_name: '', quantity: 1 }), price: num } }));
+                                            }}
+                                            onKeyDown={e => {
+                                                if (e.key === 'Enter') submitNewRow(draft.id);
+                                            }}
+                                        />
+                                    </td>
+                                    <td data-label="Сумма" style={{ textAlign: 'right' }}>
+                                        <span className={styles.readonlySum}>
+                                            {(parseMath(newRowStates[draft.id]?.quantity ?? 1) * parseMath(newRowStates[draft.id]?.price ?? 0)).toLocaleString('ru')}
+                                        </span>
+                                    </td>
+                                    <td></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <div style={{ padding: '0 1.5rem', marginTop: '1rem' }}>
-                        <button
-                            className={styles.addItemBtn}
-                            onClick={async () => {
-                                await fetch(`/api/supplies/${draft.id}/items`, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ ingredient_name: '', quantity: 1, price: 0 })
-                                });
-                                fetchData();
-                            }}
-                        >
-                            <Plus size={18} />
-                            Добавить позицию
-                        </button>
-                    </div>
-
                     {/* Footer buttons */}
-                    <div className={styles.footerActions}>
+                    <div className={styles.footerActions} style={{ marginTop: '1.5rem' }}>
                         <button className={`${styles.btn} ${styles.btnDelete}`} onClick={() => handleDeleteDraft(draft.id)}>
                             <Trash size={16} />
                             Удалить черновик
